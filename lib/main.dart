@@ -1,4 +1,5 @@
 import 'package:abushakir/abushakir.dart';
+import 'package:eccalendar/calander_grid.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -31,15 +32,15 @@ class EthiopianDatePicker extends StatefulWidget {
 
 class _EthiopianDatePickerstate extends State<EthiopianDatePicker> {
   late ETC _selectedDate;
-  late int _currentMonth;
-  late Iterable<List<dynamic>> _currentCalenderDays;
+  late ETC _currentMonth;
+  late Iterable<List<dynamic>> _calendarDays;
 
   @override
   void initState() {
     super.initState();
     _selectedDate = ETC.today();
-    _currentMonth = _selectedDate.month;
-    _currentCalenderDays = _selectedDate.monthDays(weekDayName: true);
+    _currentMonth = _selectedDate;
+    _generateCalendarDays();
   }
 
   @override
@@ -47,21 +48,40 @@ class _EthiopianDatePickerstate extends State<EthiopianDatePicker> {
     super.dispose();
   }
 
+  void _generateCalendarDays(){
+    _calendarDays = _selectedDate.monthDays(weekDayName: true);
+  }
+
   void _previousMonth(){
     setState(() {
-      _currentMonth=_selectedDate.prevMonth.month;
+      if(_currentMonth.month>1){
+        // _currentMonth = ETC(year: _selectedDate.year,month: _selectedDate.month-1,day: 1);
+        _currentMonth = _currentMonth.prevMonth;
+      }else{
+        _currentMonth = ETC(year: _currentMonth.year-1,month:13,day: 1);
+        // _currentMonth = _currentMonth.prevYear;
+      }
+      _calendarDays = _currentMonth.monthDays(weekDayName: true);
     });
   }
+
   void _nextMonth(){
     setState(() {
-      _currentMonth=_selectedDate.nextMonth.month;
+      if(_currentMonth.month<13){
+      // _currentMonth = ETC(year: _selectedDate.year,month: _selectedDate.month+1,day: 1);
+        _currentMonth = _currentMonth.nextMonth;
+      }else{
+        _currentMonth = ETC(year: _currentMonth.year+1,month:1,day: 1);
+        // _currentMonth = _currentMonth.nextYear;
+      }
+      _calendarDays = _currentMonth.monthDays(weekDayName: true);
     });
   }
   void _goToToday(){
     setState(() {
       _selectedDate = ETC.today();
-      _currentMonth= _selectedDate.month;
-      _currentCalenderDays = _selectedDate.monthDays(weekDayName: true);
+      _currentMonth= _selectedDate;
+      _calendarDays = _selectedDate.monthDays(weekDayName: true);
     });
   }
 
@@ -144,9 +164,107 @@ class _EthiopianDatePickerstate extends State<EthiopianDatePicker> {
               ],
             ),
           ),
+          // Month navigation
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.chevron_left),
+                  onPressed: _previousMonth,
+                ),
+
+                // Year input
+                // SizedBox(
+                //   width: 70,
+                //   child: TextField(
+                //     controller: _yearController,
+                //     decoration: InputDecoration(
+                //       labelText: 'Year',
+                //       border: OutlineInputBorder(),
+                //       contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                //     ),
+                //     keyboardType: TextInputType.number,
+                //     textAlign: TextAlign.center,
+                //   ),
+                // ),
+
+                // Month input
+                // Container(
+                //   width: 70,
+                //   child: TextField(
+                //     controller: _monthController,
+                //     decoration: InputDecoration(
+                //       labelText: 'Month',
+                //       border: OutlineInputBorder(),
+                //       contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                //     ),
+                //     keyboardType: TextInputType.number,
+                //     textAlign: TextAlign.center,
+                //   ),
+                // ),
+
+                // ElevatedButton(
+                //   onPressed: _updateCalendar,
+                //   child: Text('Go'),
+                //   style: ElevatedButton.styleFrom(
+                //     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                //   ),
+                // ),
+
+                IconButton(
+                  icon: Icon(Icons.chevron_right),
+                  onPressed: _nextMonth,
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Text(
+              '${_currentMonth.monthName} ${_currentMonth.year}',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+
+          // Day of week headers
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              children: _getWeekdayHeaders(),
+            ),
+          ),
+
+          // Calendar grid
+          CalendarGrid(monthDays: _calendarDays)
         ],
       ),
     );
+  }
+
+
+  List<Widget> _getWeekdayHeaders() {
+    final weekdays = _currentMonth.weekdays;
+    return List.generate(7, (index) {
+      return Expanded(
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.green.shade100,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            weekdays[index],
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+      );
+    });
   }
 }
 
