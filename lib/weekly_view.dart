@@ -1,4 +1,5 @@
 import 'package:abushakir/abushakir.dart';
+import 'package:eccalendar/utils/eth_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -9,33 +10,28 @@ class EthWeeklyView extends StatefulWidget {
   EthWeeklyViewState createState() => EthWeeklyViewState();
 }
 
-class EthWeeklyViewState extends State<EthWeeklyView> {
-  final PageController _controller = PageController(initialPage: 0);
+class EthWeeklyViewState extends State<EthWeeklyView> with EthUtils{
+  final PageController _controller = PageController(initialPage: EthUtils.initialPage);
   final EtDatetime _baseDate = EtDatetime.now();
-  final List weekDayNames = ETC.today().weekdays;
-
-  EtDatetime getfirstDayOfWeek(EtDatetime date) {
-    return date.subtract(Duration(days: date.weekday - 1));
-  }
-
-  List<EtDatetime> getWeekDates(EtDatetime startOfWeek) {
-    return List.generate(7, (index) => startOfWeek.add(Duration(days: index)));
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Week View(Moth view) Calendar")),
+      appBar: AppBar(title: Text("Week View")),
       body: PageView.builder(
         controller: _controller,
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
+          final monthOffset = index - EthUtils.initialPage;
+          final targetMonth = EtDatetime(
+            year: _baseDate.year,
+            month: _baseDate.month + monthOffset,
+          );
           EtDatetime weekStart = getfirstDayOfWeek(
-            _baseDate.add(Duration(days: index * 7)),
+            targetMonth.add(Duration(days: index * 7)),
           );
 
           List<EtDatetime> weekDays = getWeekDates(weekStart);
-
           return Padding(
             padding: const EdgeInsets.all(12.0),
             child: Row(

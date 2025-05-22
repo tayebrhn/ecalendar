@@ -1,4 +1,5 @@
 import 'package:abushakir/abushakir.dart';
+import 'package:eccalendar/utils/eth_utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -7,17 +8,14 @@ class EthMonthlyView extends StatefulWidget {
   const EthMonthlyView({super.key});
 
   @override
-  EthMonthlyViewState createState() => EthMonthlyViewState();
+  _EthMonthlyViewState createState() => _EthMonthlyViewState();
 }
 
-class EthMonthlyViewState extends State<EthMonthlyView> {
+class _EthMonthlyViewState extends State<EthMonthlyView> {
   final EtDatetime _baseMonth = EtDatetime.now();
-  static const _initialPage = 10000;
-  final PageController _controller = PageController(initialPage: _initialPage);
-
-  EtDatetime getfirstDayOfWeek(EtDatetime date) {
-    return date.subtract(Duration(days: date.weekday - 1));
-  }
+  final PageController _controller = PageController(
+    initialPage: EthUtils.initialPage,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +28,7 @@ class EthMonthlyViewState extends State<EthMonthlyView> {
         pageSnapping: true,
         scrollBehavior: ScrollBehavior(),
         itemBuilder: (context, index) {
-          final monthOffset = index - _initialPage;
+          final monthOffset = index - EthUtils.initialPage;
           final targetMonth = EtDatetime(
             year: _baseMonth.year,
             month: _baseMonth.month + monthOffset,
@@ -42,10 +40,10 @@ class EthMonthlyViewState extends State<EthMonthlyView> {
   }
 }
 
-class MonthlyCalendarView extends StatelessWidget {
+class MonthlyCalendarView extends StatelessWidget with EthUtils {
   final EtDatetime month;
   final EtDatetime today;
-  const MonthlyCalendarView({
+  MonthlyCalendarView({
     super.key,
     required this.month,
     required this.today,
@@ -60,7 +58,8 @@ class MonthlyCalendarView extends StatelessWidget {
     //prev month
     final prevMonth = EtDatetime(year: month.year, month: month.month - 1);
     final prevMonthDays =
-        ETC(year: prevMonth.year, month: prevMonth.month).monthDays().length+1;
+        ETC(year: prevMonth.year, month: prevMonth.month).monthDays().length +
+        1;
     final leadingDays = [
       for (int i = startWeekDay; i > 0; i--)
         _DayCell(
@@ -90,7 +89,11 @@ class MonthlyCalendarView extends StatelessWidget {
     final trailingDays = [
       for (int d = 1; d <= trailingNeeded; d++)
         _DayCell(
-          date: EtDatetime(year: nextMonth.year, month: nextMonth.month, day: d),
+          date: EtDatetime(
+            year: nextMonth.year,
+            month: nextMonth.month,
+            day: d,
+          ),
           isCurrentMonth: false,
         ),
     ];
@@ -101,7 +104,8 @@ class MonthlyCalendarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final days = _generateMonthDays(month);
-    final weekdayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    List<EtDatetime> weekDays = getWeekDates(month);
 
     return Column(
       children: [
@@ -118,21 +122,26 @@ class MonthlyCalendarView extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children:
-                weekdayLabels
-                    .map(
-                      (day) => Expanded(
-                        child: Center(
-                          child: Text(
-                            day,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[700],
-                            ),
+                weekDays.map((day) {
+                  return Container(
+                    width: 48,
+                    decoration: BoxDecoration(
+                      color: Colors.blueAccent,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      children: [
+                        Text(
+                          DateFormat.E().format(
+                            DateTime.fromMillisecondsSinceEpoch(day.moment),
                           ),
+                          style: TextStyle(color: Colors.white70),
                         ),
-                      ),
-                    )
-                    .toList(),
+                      ],
+                    ),
+                  );
+                }).toList(),
           ),
         ),
 
