@@ -1,5 +1,6 @@
 import 'package:abushakir/abushakir.dart';
 import 'package:eccalendar/calander_grid.dart';
+import 'package:eccalendar/month_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const EthiopianDatePicker(title: 'EthCalender'),
+      home: const EthMonthlyView(),
     );
   }
 }
