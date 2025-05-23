@@ -1,82 +1,260 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class CalendarGrid extends StatelessWidget {
-  final Iterable<List<dynamic>> monthDays;
+void main() {
+  runApp(const MyApp());
+}
 
-  const CalendarGrid({Key? key, required this.monthDays}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Convert the iterable to a list for easier processing
-    final daysList = monthDays.toList();
+    return MaterialApp(
+      title: 'Calendar Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const CalendarScreen(),
+    );
+  }
+}
 
-    // Find the first day's weekday (0=Sunday, 6=Saturday in Ethiopian calendar)
-    final firstDay = daysList.first;
-    final firstWeekday = getWeekdayIndex(firstDay[3].toString());
+class CalendarScreen extends StatefulWidget {
+  const CalendarScreen({super.key});
 
-    // Create a list with leading empty days if month doesn't start on Sunday
-    final allDays = <List<dynamic>?>[];
-    for (var i = 0; i < firstWeekday; i++) {
-      allDays.add(null); // Add empty days before the 1st
-    }
-    allDays.addAll(daysList);
+  @override
+  State<CalendarScreen> createState() => _CalendarScreenState();
+}
 
-    // Group into weeks (7 days each)
-    final weeks = <List<List<dynamic>?>>[];
-    for (var i = 0; i < allDays.length; i += 7) {
-      final end = (i + 7 < allDays.length) ? i + 7 : allDays.length;
-      var week = allDays.sublist(i, end);
-      // Ensure each week has 7 days
-      while (week.length < 7) {
-        week.add(null);
-      }
-      weeks.add(week);
-    }
+class _CalendarScreenState extends State<CalendarScreen> {
+  final PageController _pageController = PageController(initialPage: _initialPage);
+  DateTime _currentDate = DateTime.now();
+  
+  static int get _initialPage => 12 * 5; // Start at a middle page (5 years in future)
 
-    return Table(
-      border: TableBorder.all(),
-      children: [
-        // Header row with day names
-        const TableRow(
-          decoration: BoxDecoration(color: Colors.grey),
-          children: [
-            TableCell(child: Center(child: Text('እሁድ'))), // Sunday
-            TableCell(child: Center(child: Text('ሰኞ'))),   // Monday
-            TableCell(child: Center(child: Text('ማክሰኞ'))), // Tuesday
-            TableCell(child: Center(child: Text('ረቡዕ'))), // Wednesday
-            TableCell(child: Center(child: Text('ሐሙስ'))), // Thursday
-            TableCell(child: Center(child: Text('አርብ'))),  // Friday
-            TableCell(child: Center(child: Text('ቅዳሜ'))), // Saturday
-          ],
-        ),
-        // Add each week as a row
-        ...weeks.map((week) {
-          return TableRow(
-            children: week.map((day) {
-              return TableCell(
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  height: 50,
-                  child: day == null
-                      ? const SizedBox.shrink() // Empty cell
-                      : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(day[2].toString()), // Day number
-                    ],
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Calendar')),
+      body: Column(
+        children: [
+          // Month/year header with navigation
+          _buildHeader(),
+          
+          // Weekday names
+          _buildWeekdays(),
+          
+          // The swipeable calendar with animation
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentDate = DateTime(
+                    DateTime.now().year + (index - _initialPage) ~/ 12,
+                    DateTime.now().month + (index - _initialPage) % 12,
+                    1,
+                  );
+                });
+              },
+              itemBuilder: (context, index) {
+                final date = DateTime(
+                  DateTime.now().year + (index - _initialPage) ~/ 12,
+                  DateTime.now().month + (index - _initialPage) % 12,
+                  1,
+                );
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (Widget child, Animation<double> animation) {
+                    return SlideTransition(
+                      position: Tween<Offset>(
+                        begin: Offset(index > _initialPage ? 1.0 : -1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    );
+                  },
+                  child: KeyedSubtree(
+                    key: ValueKey<DateTime>(date),
+                    child: MonthTableView(
+                      selectedDate: _currentDate,
+                      displayedDate: date,
+                      onDateSelected: (newDate) {
+                        setState(() {
+                          _currentDate = newDate;
+                          // Jump to the correct page if needed
+                          final diff = (newDate.year - DateTime.now().year) * 12 + 
+                                      (newDate.month - DateTime.now().month);
+                          _pageController.jumpToPage(_initialPage + diff);
+                        });
+                      },
+                    ),
                   ),
-                ),
-              );
-            }).toList(),
-          );
-        }),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            onPressed: () => _navigateToMonth(-1),
+          ),
+          Text(
+            DateFormat('MMMM yyyy').format(_currentDate),
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          IconButton(
+            icon: const Icon(Icons.chevron_right),
+            onPressed: () => _navigateToMonth(1),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeekdays() {
+    return const Row(
+      children: [
+        Expanded(child: Center(child: Text('Mon'))),
+        Expanded(child: Center(child: Text('Tue'))),
+        Expanded(child: Center(child: Text('Wed'))),
+        Expanded(child: Center(child: Text('Thu'))),
+        Expanded(child: Center(child: Text('Fri'))),
+        Expanded(child: Center(child: Text('Sat'))),
+        Expanded(child: Center(child: Text('Sun'))),
       ],
     );
   }
 
-  // Helper function to get weekday index (0=Sunday, 6=Saturday)
-  int getWeekdayIndex(String weekday) {
-    const weekdays = ['እሁድ', 'ሰኞ', 'ማክሰኞ', 'ረቡዕ', 'ሐሙስ', 'አርብ', 'ቅዳሜ'];
-    return weekdays.indexOf(weekday);
+  void _navigateToMonth(int monthsToAdd) {
+    final newDate = DateTime(
+      _currentDate.year,
+      _currentDate.month + monthsToAdd,
+      1,
+    );
+    final diff = (newDate.year - DateTime.now().year) * 12 + 
+                (newDate.month - DateTime.now().month);
+    _pageController.animateToPage(
+      _initialPage + diff,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+}
+
+class MonthTableView extends StatelessWidget {
+  final DateTime selectedDate;
+  final DateTime displayedDate;
+  final ValueChanged<DateTime> onDateSelected;
+
+  const MonthTableView({
+    super.key,
+    required this.selectedDate,
+    required this.displayedDate,
+    required this.onDateSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Table(
+      children: _buildCalendarRows(),
+    );
+  }
+
+  List<TableRow> _buildCalendarRows() {
+    final year = displayedDate.year;
+    final month = displayedDate.month;
+    final firstDay = DateTime(year, month, 1);
+    final daysInMonth = DateTime(year, month + 1, 0).day;
+    
+    // Calculate weekday of first day (1 = Monday, 7 = Sunday)
+    final firstWeekday = firstDay.weekday;
+    
+    // Create list of days to display (including leading/trailing days from other months)
+    final days = <DateTime>[];
+    
+    // Add leading days from previous month if needed
+    if (firstWeekday != 1) {
+      final previousMonth = DateTime(year, month - 1, 1);
+      final daysInPreviousMonth = DateTime(year, month, 0).day;
+      for (var i = daysInPreviousMonth - (firstWeekday - 2); i <= daysInPreviousMonth; i++) {
+        days.add(DateTime(year, month - 1, i));
+      }
+    }
+    
+    // Add current month days
+    for (var i = 1; i <= daysInMonth; i++) {
+      days.add(DateTime(year, month, i));
+    }
+    
+    // Add trailing days from next month if needed
+    final totalCells = days.length > 35 ? 42 : 35; // 6 or 5 weeks
+    for (var i = 1; days.length < totalCells; i++) {
+      days.add(DateTime(year, month + 1, i));
+    }
+    
+    // Build table rows
+    final rows = <TableRow>[];
+    
+    // Add day cells
+    for (var i = 0; i < days.length; i += 7) {
+      final week = days.sublist(i, i + 7);
+      rows.add(TableRow(
+        children: week.map((date) => _buildDayCell(date)).toList(),
+      ));
+    }
+    
+    return rows;
+  }
+
+  Widget _buildDayCell(DateTime date) {
+    final isCurrentMonth = date.month == displayedDate.month;
+    final isSelected = date.day == selectedDate.day && 
+                      date.month == selectedDate.month && 
+                      date.year == selectedDate.year;
+    final isToday = date.day == DateTime.now().day && 
+                   date.month == DateTime.now().month && 
+                   date.year == DateTime.now().year;
+    
+    return GestureDetector(
+      onTap: () => onDateSelected(date),
+      child: Container(
+        margin: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: isSelected 
+              ? Colors.blue 
+              : isToday 
+                  ? Colors.blue.withOpacity(0.2) 
+                  : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: Text(
+            '${date.day}',
+            style: TextStyle(
+              color: isCurrentMonth ? Colors.black : Colors.grey,
+              fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

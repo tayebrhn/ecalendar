@@ -35,13 +35,15 @@ class EthMonthlyView extends StatefulWidget {
 class _EthMonthlyViewState extends State<EthMonthlyView> {
   EtDatetime _currentDate = EtDatetime.now();
 
-  late final PageController _controller;
+  late final PageController _pageController = PageController(
+    initialPage: EthUtils.initialPage,
+  );
+
   late List<EtDatetime> weekDays;
 
   @override
   void initState() {
     super.initState();
-    _controller = PageController(initialPage: EthUtils.initialPage);
     weekDays = EthUtils.getWeekDates(_currentDate);
   }
 
@@ -53,16 +55,13 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
         mainAxisSize: MainAxisSize.max,
         children: [
           //
-          // _buildHeader(),
+          _buildHeader(),
+
           // Weekday headers,
-          Text(
-            '${_currentDate.monthGeez} ${_currentDate.year}',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
           _buildWeekdays(),
           Expanded(
             child: PageView.builder(
-              controller: _controller,
+              controller: _pageController,
               scrollDirection: Axis.horizontal,
               dragStartBehavior: DragStartBehavior.down,
               pageSnapping: true,
@@ -86,9 +85,7 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
                 //   year: _currentDate.year,
                 //   month: _currentDate.month + monthOffset,
                 // );
-                return MonthlyCalendarView(
-                  month: _currentDate,
-                );
+                return MonthlyCalendarView(month: _currentDate);
               },
             ),
           ),
@@ -110,4 +107,35 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
       ],
     );
   }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            onPressed: () => _pageController.previousPage(
+  duration: const Duration(milliseconds: 300), // Animation duration
+  curve: Curves.easeInOut, // Animation curve
+),
+          ),
+          Text(
+            '${_currentDate.monthGeez} ${_currentDate.year}',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          IconButton(
+            icon: const Icon(Icons.chevron_right),
+            onPressed: () => 
+            _pageController.nextPage(
+  duration: const Duration(milliseconds: 300), // Animation duration
+  curve: Curves.easeInOut, // Animation curve
+)
+          ),
+        ],
+      ),
+    );
+  }
+
 }
