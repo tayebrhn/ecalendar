@@ -10,7 +10,7 @@ class EthWeeklyView extends StatefulWidget {
   EthWeeklyViewState createState() => EthWeeklyViewState();
 }
 
-class EthWeeklyViewState extends State<EthWeeklyView> with EthUtils{
+class EthWeeklyViewState extends State<EthWeeklyView>{
   final PageController _controller = PageController(initialPage: EthUtils.initialPage);
   final EtDatetime _baseDate = EtDatetime.now();
 
@@ -27,11 +27,11 @@ class EthWeeklyViewState extends State<EthWeeklyView> with EthUtils{
             year: _baseDate.year,
             month: _baseDate.month + monthOffset,
           );
-          EtDatetime weekStart = getfirstDayOfWeek(
+          EtDatetime weekStart = EthUtils.getfirstDayOfWeek(
             targetMonth.add(Duration(days: index * 7)),
           );
 
-          List<EtDatetime> weekDays = getWeekDates(weekStart);
+          List<EtDatetime> weekDays = EthUtils.getWeekDates(weekStart);
           return Padding(
             padding: const EdgeInsets.all(12.0),
             child: Row(

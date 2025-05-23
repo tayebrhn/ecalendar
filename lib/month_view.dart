@@ -1,56 +1,15 @@
 import 'package:abushakir/abushakir.dart';
-import 'package:eccalendar/utils/eth_utils.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
-class EthMonthlyView extends StatefulWidget {
-  const EthMonthlyView({super.key});
-
-  @override
-  _EthMonthlyViewState createState() => _EthMonthlyViewState();
-}
-
-class _EthMonthlyViewState extends State<EthMonthlyView> {
-  final EtDatetime _baseMonth = EtDatetime.now();
-  final PageController _controller = PageController(
-    initialPage: EthUtils.initialPage,
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Month View")),
-      body: PageView.builder(
-        controller: _controller,
-        scrollDirection: Axis.horizontal,
-        dragStartBehavior: DragStartBehavior.down,
-        pageSnapping: true,
-        scrollBehavior: ScrollBehavior(),
-        itemBuilder: (context, index) {
-          final monthOffset = index - EthUtils.initialPage;
-          final targetMonth = EtDatetime(
-            year: _baseMonth.year,
-            month: _baseMonth.month + monthOffset,
-          );
-          return MonthlyCalendarView(today: _baseMonth, month: targetMonth);
-        },
-      ),
-    );
-  }
-}
-
-class MonthlyCalendarView extends StatelessWidget with EthUtils {
+class MonthlyCalendarView extends StatelessWidget {
   final EtDatetime month;
-  final EtDatetime today;
-  MonthlyCalendarView({
+  const MonthlyCalendarView({
     super.key,
     required this.month,
-    required this.today,
   });
 
   List<_DayCell> _generateMonthDays(EtDatetime month) {
-    final firstDay = EtDatetime(year: month.year, month: month.month, day: 1);
+    final firstDay = EtDatetime(year: month.year, month: month.month);
     final startWeekDay = firstDay.weekday % 7;
     final totalDays =
         ETC(year: month.year, month: month.month).monthDays().length;
@@ -81,8 +40,6 @@ class MonthlyCalendarView extends StatelessWidget with EthUtils {
         ),
     ];
 
-    print("DATES:$totalDays MONTH:${month.month}");
-
     // Next month
     final trailingNeeded = 42 - (leadingDays.length + currentDays.length);
     final nextMonth = EtDatetime(year: month.year, month: month.month + 1);
@@ -104,46 +61,13 @@ class MonthlyCalendarView extends StatelessWidget with EthUtils {
   @override
   Widget build(BuildContext context) {
     final days = _generateMonthDays(month);
+    final EtDatetime today = EtDatetime.now();
 
-    List<EtDatetime> weekDays = getWeekDates(month);
 
     return Column(
       children: [
         SizedBox(height: 16),
-        Text(
-          '${month.monthGeez} ${month.year}',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 8),
-
-        // Weekday headers
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children:
-                weekDays.map((day) {
-                  return Container(
-                    width: 48,
-                    decoration: BoxDecoration(
-                      color: Colors.blueAccent,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Column(
-                      children: [
-                        Text(
-                          DateFormat.E().format(
-                            DateTime.fromMillisecondsSinceEpoch(day.moment),
-                          ),
-                          style: TextStyle(color: Colors.white70),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-          ),
-        ),
+        
 
         SizedBox(height: 4),
 
