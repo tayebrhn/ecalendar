@@ -50,7 +50,13 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Month View")),
+      appBar: AppBar(title: Text("Month View"),actions: [IconButton(
+            icon: Icon(Icons.calendar_today_rounded,),
+            onPressed: () => 
+            setState(() {
+              _currentDate = EtDatetime.now();
+            })
+          )],),
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
