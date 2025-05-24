@@ -12,6 +12,9 @@ static List<EtDatetime> getMonthDates(EtDatetime startOfWeek) {
     return List.generate(30, (index) => startOfWeek.add(Duration(days: index)));
 }
   static final List _weekDayNames = ETC.today().weekdays;
+static bool isSameDay(EtDatetime a, EtDatetime b) {
+  return a.year == b.year && a.month == b.month && a.day == b.day;
+}
 
 }
 
