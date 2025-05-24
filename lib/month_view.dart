@@ -1,4 +1,5 @@
 import 'package:abushakir/abushakir.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import './utils/eth_utils.dart';
@@ -12,7 +13,6 @@ class EthMonthlyView extends StatefulWidget {
 class _EthMonthlyViewState extends State<EthMonthlyView> {
   EtDatetime _currentDate = EtDatetime.now();
   EtDatetime _selectedtDate = EtDatetime.now();
-
 
   late final PageController _pageController = PageController(
     initialPage: EthUtils.initialPage,
@@ -40,7 +40,7 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
                 _currentDate = newDate;
                 // Jump to the correct page if needed
                 final diff =
-                    (newDate.year - EtDatetime.now().year) * 12 +
+                    (newDate.year - EtDatetime.now().year) * 13 +
                     (newDate.month - EtDatetime.now().month);
                 _pageController.jumpToPage(EthUtils.initialPage + diff);
               });
@@ -81,9 +81,7 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
           month: EtDatetime.now().month + (index - EthUtils.initialPage) % 12,
           day: 1,
         );
-        return KeyedSubtree(
-          key: ValueKey<EtDatetime>(date),
-          child: MonthTableView(
+        return MonthTableView(
             selectedDate: _currentDate,
             displayedDate: date,
             onDateSelected: (newDate) {
@@ -96,7 +94,6 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
                 _pageController.jumpToPage(EthUtils.initialPage + diff);
               });
             },
-          ),
         );
       },
     );
@@ -116,9 +113,10 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
               year:
                   EtDatetime.now().year + (value - EthUtils.initialPage) ~/ 12,
               month:
-                  EtDatetime.now().month + (value - EthUtils.initialPage) % 12,
+                  EtDatetime.now().month + (value - EthUtils.initialPage) % 13,
               day: 1,
             );
+            print("CURRENTVALUE:${value}");
           });
         },
         itemBuilder: (context, index) {
@@ -127,7 +125,10 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
           //   year: _currentDate.year,
           //   month: _currentDate.month + monthOffset,
           // );
-          return MonthlyCalendarView(month: _currentDate,selectedDate: _selectedtDate,);
+          return MonthlyCalendarView(
+            month: _currentDate,
+            selectedDate: _selectedtDate,
+          );
         },
       ),
     );
@@ -184,10 +185,10 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
 }
 
 class MonthlyCalendarView extends StatefulWidget {
-  EtDatetime month;
-  EtDatetime? selectedDate;
+  final EtDatetime month;
+  EtDatetime selectedDate;
 
-  MonthlyCalendarView({super.key, required this.month, this.selectedDate});
+  MonthlyCalendarView({super.key, required this.month, required this.selectedDate});
 
   @override
   State<MonthlyCalendarView> createState() => _MonthlyCalendarViewState();
@@ -201,7 +202,12 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
         ETC(year: month.year, month: month.month).monthDays().length;
 
     //prev month
-    final prevMonth = EtDatetime(year: month.year, month: month.month - 1);
+    final EtDatetime prevMonth;
+    if (month.month - 1 == 0) {
+      prevMonth = EtDatetime(year: month.year - 1, month: 13);
+    } else {
+      prevMonth = EtDatetime(year: month.year, month: month.month - 1);
+    }
     final prevMonthDays =
         ETC(year: prevMonth.year, month: prevMonth.month).monthDays().length +
         1;
@@ -230,8 +236,6 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
     final totalCells = (leadingDays.length + currentDays.length) > 35 ? 42 : 35;
     final trailingNeeded =
         totalCells - (leadingDays.length + currentDays.length);
-    print((leadingDays.length + currentDays.length));
-
     final nextMonth = EtDatetime(year: month.year, month: month.month + 1);
     final trailingDays = [
       for (int d = 1; d <= trailingNeeded; d++)
@@ -257,10 +261,6 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
 
     return Column(
       children: [
-        SizedBox(height: 16),
-
-        SizedBox(height: 4),
-
         // Full 6-row grid
         Expanded(
           child: GridView.builder(
@@ -276,10 +276,7 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
               final cell = days[index];
               final isToday = EthUtils.isSameDay(cell.date, today);
               final isSelected =
-                  selectedDate != null &&
-                  EthUtils.isSameDay(cell.date, selectedDate!);
-print("SELECTEDDATE:${selectedDate}");
-                    print("SELECTEDWIDGET.DATE:${widget.selectedDate}");
+                  EthUtils.isSameDay(cell.date, selectedDate);
               return GestureDetector(
                 onTap: () {
                   setState(() {
@@ -315,6 +312,7 @@ print("SELECTEDDATE:${selectedDate}");
             },
           ),
         ),
+        Column(children: [Text("Todo Events")]),
       ],
     );
   }
