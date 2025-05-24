@@ -11,6 +11,8 @@ class EthMonthlyView extends StatefulWidget {
 
 class _EthMonthlyViewState extends State<EthMonthlyView> {
   EtDatetime _currentDate = EtDatetime.now();
+  EtDatetime _selectedtDate = EtDatetime.now();
+
 
   late final PageController _pageController = PageController(
     initialPage: EthUtils.initialPage,
@@ -125,7 +127,7 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
           //   year: _currentDate.year,
           //   month: _currentDate.month + monthOffset,
           // );
-          return MonthlyCalendarView(month: _currentDate,);
+          return MonthlyCalendarView(month: _currentDate,selectedDate: _selectedtDate,);
         },
       ),
     );
@@ -276,13 +278,12 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
               final isSelected =
                   selectedDate != null &&
                   EthUtils.isSameDay(cell.date, selectedDate!);
-
+print("SELECTEDDATE:${selectedDate}");
+                    print("SELECTEDWIDGET.DATE:${widget.selectedDate}");
               return GestureDetector(
                 onTap: () {
                   setState(() {
                     widget.selectedDate = cell.date;
-                    print("SELECTEDDATE:${selectedDate}");
-                    print("SELECTEDWIDGET.DATE:${widget.selectedDate}");
                   });
                 },
                 child: Container(
