@@ -1,7 +1,9 @@
 import 'package:abushakir/abushakir.dart';
+import 'package:eccalendar/screens/date_details.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../utils/eth_utils.dart';
 
 class EthMonthlyView extends StatefulWidget {
@@ -17,7 +19,6 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
   late final PageController _pageController = PageController(
     initialPage: EthUtils.initialPage,
   );
-
 
   @override
   void initState() {
@@ -48,7 +49,10 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Month View"),
+        title: Text(
+          '${_currentDate.monthGeez} ${_currentDate.year}',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.calendar_today_rounded),
@@ -68,7 +72,7 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
-        children: [Expanded(child: _buildGrid())],
+        children: [buildWeekdayHeaders(2), Expanded(child: _buildGrid())],
       ),
     );
   }
@@ -137,11 +141,46 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
           return MonthlyCalendarView(
             month: _currentDate,
             selectedDate: _selectedtDate,
-            prevMonthCallback: _goToPreviousMonth,
-            nextMonthCallback: _goToNextMonth,
+            // prevMonthCallback: _goToPreviousMonth,
+            // nextMonthCallback: _goToNextMonth,
           );
         },
       ),
+    );
+  }
+
+  Widget buildWeekdayHeaders(int startOfWeek) {
+    // Generate weekday names starting from custom start day
+    final weekdays = List.generate(7, (index) {
+      final weekday =
+          (startOfWeek - 1 + index) % 7 + 1; // Calculate weekday number
+      return DateFormat(
+        'E',
+      ).format(DateTime(2023, 1, weekday)); // Any date with known weekday
+    });
+
+    return Table(
+      children: [
+        TableRow(
+          children:
+              weekdays
+                  .map(
+                    (day) => Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          day,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+        ),
+      ],
     );
   }
 }
@@ -149,15 +188,15 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
 class MonthlyCalendarView extends StatefulWidget {
   final EtDatetime month;
   EtDatetime selectedDate;
-  final VoidCallback prevMonthCallback;
-  final VoidCallback nextMonthCallback;
+  // final VoidCallback prevMonthCallback;
+  // final VoidCallback nextMonthCallback;
 
   MonthlyCalendarView({
     super.key,
     required this.month,
     required this.selectedDate,
-    required this.prevMonthCallback,
-    required this.nextMonthCallback,
+    // required this.prevMonthCallback,
+    // required this.nextMonthCallback,
   });
 
   @override
@@ -165,7 +204,6 @@ class MonthlyCalendarView extends StatefulWidget {
 }
 
 class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
-
   @override
   Widget build(BuildContext context) {
     final EtDatetime month = widget.month;
@@ -174,101 +212,108 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
     final EtDatetime today = EtDatetime.now();
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        //header
-        _buildHeader(),
-        // Weekday headers,
-        _buildWeekdays(),
         // Full 6-row grid
-        Expanded(
-          child: GridView.builder(
-            physics: NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(4),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-            ),
-            itemCount: days.length,
-            itemBuilder: (context, index) {
-              final cell = days[index];
-              final isToday = EthUtils.isSameDay(cell.date, today);
-              final isSelected = EthUtils.isSameDay(cell.date, selectedDate);
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    widget.selectedDate = cell.date;
-                  });
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color:
-                        isSelected
-                            ? Colors.blueAccent.withOpacity(0.6)
-                            : isToday
-                            ? Colors.blue[200]
-                            : cell.isCurrentMonth
-                            ? null
-                            : Colors.grey[200],
-                    border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    '${cell.date.day}',
-                    style: TextStyle(
-                      color: cell.isCurrentMonth ? Colors.black : Colors.grey,
-                      fontWeight:
-                          isSelected || isToday
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-                Expanded(child: Text("Todo Events")),
+        Table(children: _buildCalendarRows()),
+        Flexible(fit: FlexFit.loose, child: Text("Todo Events")),
       ],
     );
   }
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.chevron_left),
-            onPressed: widget.prevMonthCallback,
+  List<TableRow> _buildCalendarRows() {
+    // Create list of days to display (including leading/trailing days from other months)
+    final List<_DayCell> days = _generateMonthDays(widget.month);
+
+    // Build table rows
+    final rows = <TableRow>[];
+
+    // Add day cells
+    for (var i = 0; i < days.length; i += 7) {
+      final week = days.sublist(i, i + 7);
+
+      rows.add(
+        TableRow(children: week.map((date) => _buildDayCell(date)).toList()),
+      );
+    }
+
+    return rows;
+  }
+
+  Widget _buildDayCell(_DayCell date) {
+    final EtDatetime today = EtDatetime.now();
+    EtDatetime? selectedDate = widget.selectedDate;
+
+    final cell = date;
+    final isToday = EthUtils.isSameDay(cell.date, today);
+    final isSelected = EthUtils.isSameDay(cell.date, selectedDate);
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          widget.selectedDate = cell.date;
+        });
+        if (isSelected) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EtDateDetails(selectedDate: cell.date),
+            ),
+          );
+        }
+      },
+      child: Container(
+        alignment: Alignment.center,
+        margin: const EdgeInsets.all(1),
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color:
+              isSelected
+                  ? Colors.blueAccent.withOpacity(0.6)
+                  : isToday
+                  ? Colors.blue[200]
+                  : cell.isCurrentMonth
+                  ? null
+                  : Colors.grey[200],
+          border: Border.all(color: Colors.grey[300]!),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          '${cell.date.day}',
+          style: TextStyle(
+            color: cell.isCurrentMonth ? Colors.black : Colors.grey,
+            fontWeight:
+                isSelected || isToday ? FontWeight.bold : FontWeight.normal,
           ),
-          Text(
-            '${widget.month.monthGeez} ${widget.month.year}',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          IconButton(
-            icon: const Icon(Icons.chevron_right),
-            onPressed: widget.nextMonthCallback,
-          ),
-        ],
+        ),
       ),
     );
   }
-  Widget _buildWeekdays() {
-    return const Row(
-      children: [
-        Expanded(child: Center(child: Text('Mon'))),
-        Expanded(child: Center(child: Text('Tue'))),
-        Expanded(child: Center(child: Text('Wed'))),
-        Expanded(child: Center(child: Text('Thu'))),
-        Expanded(child: Center(child: Text('Fri'))),
-        Expanded(child: Center(child: Text('Sat'))),
-        Expanded(child: Center(child: Text('Sun'))),
-      ],
-    );
-  }
+
+  // Widget _buildHeader() {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(16.0),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         IconButton(
+  //           icon: const Icon(Icons.chevron_left),
+  //           onPressed: widget.prevMonthCallback,
+  //         ),
+  //         Text(
+  //           '${widget.month.monthGeez} ${widget.month.year}',
+  //           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  //         ),
+  //         IconButton(
+  //           icon: const Icon(Icons.chevron_right),
+  //           onPressed: widget.nextMonthCallback,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   List<_DayCell> _generateMonthDays(EtDatetime month) {
     final firstDay = EtDatetime(year: month.year, month: month.month);
     final startWeekDay = firstDay.weekday % 7;
