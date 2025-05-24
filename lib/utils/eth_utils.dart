@@ -14,3 +14,4 @@ static List<EtDatetime> getMonthDates(EtDatetime startOfWeek) {
   static final List _weekDayNames = ETC.today().weekdays;
 
 }
+

@@ -50,13 +50,25 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Month View"),actions: [IconButton(
-            icon: Icon(Icons.calendar_today_rounded,),
-            onPressed: () => 
-            setState(() {
-              _currentDate = EtDatetime.now();
-            })
-          )],),
+      appBar: AppBar(
+        title: Text("Month View"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.calendar_today_rounded),
+            onPressed:
+                () {
+                        setState(() {
+                          var newDate =EtDatetime.now();
+                          _currentDate = newDate;
+                          // Jump to the correct page if needed
+                          final diff = (newDate.year - EtDatetime.now().year) * 12 + 
+                                      (newDate.month - EtDatetime.now().month);
+                          _pageController.jumpToPage(EthUtils.initialPage + diff);
+                        });
+                },
+          ),
+        ],
+      ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -65,37 +77,86 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
 
           // Weekday headers,
           _buildWeekdays(),
+
           Expanded(
-            child: PageView.builder(
+            child: _buildGrid(),
+          ),
+        ],
+      ),
+    );
+  }
+Widget _tableGrid(){
+  return PageView.builder(
               controller: _pageController,
-              scrollDirection: Axis.horizontal,
-              dragStartBehavior: DragStartBehavior.down,
-              pageSnapping: true,
-              scrollBehavior: ScrollBehavior(),
               onPageChanged: (value) {
                 setState(() {
                   _currentDate = EtDatetime(
-                    year:
-                        EtDatetime.now().year +
-                        (value - EthUtils.initialPage) ~/ 12,
-                    month:
-                        EtDatetime.now().month +
-                        (value - EthUtils.initialPage) % 12,
-                    day: 1,
-                  );
+                  year:
+                      EtDatetime.now().year +
+                      (value - EthUtils.initialPage) ~/ 12,
+                  month:
+                      EtDatetime.now().month +
+                      (value - EthUtils.initialPage) % 12,
+                  day: 1,
+                );
                 });
               },
               itemBuilder: (context, index) {
-                // final monthOffset = index - EthUtils.initialPage;
-                // final targetMonth = EtDatetime(
-                //   year: _currentDate.year,
-                //   month: _currentDate.month + monthOffset,
-                // );
-                return MonthlyCalendarView(month: _currentDate);
+                final date = EtDatetime(
+                  year:
+                      EtDatetime.now().year +
+                      (index - EthUtils.initialPage) ~/ 12,
+                  month:
+                      EtDatetime.now().month +
+                      (index - EthUtils.initialPage) % 12,
+                  day: 1,
+                );
+                return KeyedSubtree(
+                    key: ValueKey<EtDatetime>(date),
+                    child: MonthTableView(
+                      selectedDate: _currentDate,
+                      displayedDate: date,
+                      onDateSelected: (newDate) {
+                        setState(() {
+                          _currentDate = newDate;
+                          // Jump to the correct page if needed
+                          final diff = (newDate.year - EtDatetime.now().year) * 12 + 
+                                      (newDate.month - EtDatetime.now().month);
+                          _pageController.jumpToPage(EthUtils.initialPage + diff);
+                        });
+                      },
+                    ),
+                  );
               },
-            ),
-          ),
-        ],
+            );
+}
+  Widget _buildGrid() {
+    return Expanded(
+      child: PageView.builder(
+        controller: _pageController,
+        scrollDirection: Axis.horizontal,
+        dragStartBehavior: DragStartBehavior.down,
+        pageSnapping: true,
+        scrollBehavior: ScrollBehavior(),
+        onPageChanged: (value) {
+          setState(() {
+            _currentDate = EtDatetime(
+              year:
+                  EtDatetime.now().year + (value - EthUtils.initialPage) ~/ 12,
+              month:
+                  EtDatetime.now().month + (value - EthUtils.initialPage) % 12,
+              day: 1,
+            );
+          });
+        },
+        itemBuilder: (context, index) {
+          // final monthOffset = index - EthUtils.initialPage;
+          // final targetMonth = EtDatetime(
+          //   year: _currentDate.year,
+          //   month: _currentDate.month + monthOffset,
+          // );
+          return MonthlyCalendarView(month: _currentDate);
+        },
       ),
     );
   }
@@ -122,10 +183,13 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
         children: [
           IconButton(
             icon: const Icon(Icons.chevron_left),
-            onPressed: () => _pageController.previousPage(
-  duration: const Duration(milliseconds: 300), // Animation duration
-  curve: Curves.easeInOut, // Animation curve
-),
+            onPressed:
+                () => _pageController.previousPage(
+                  duration: const Duration(
+                    milliseconds: 300,
+                  ), // Animation duration
+                  curve: Curves.easeInOut, // Animation curve
+                ),
           ),
           Text(
             '${_currentDate.monthGeez} ${_currentDate.year}',
@@ -133,15 +197,16 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
           ),
           IconButton(
             icon: const Icon(Icons.chevron_right),
-            onPressed: () => 
-            _pageController.nextPage(
-  duration: const Duration(milliseconds: 300), // Animation duration
-  curve: Curves.easeInOut, // Animation curve
-)
+            onPressed:
+                () => _pageController.nextPage(
+                  duration: const Duration(
+                    milliseconds: 300,
+                  ), // Animation duration
+                  curve: Curves.easeInOut, // Animation curve
+                ),
           ),
         ],
       ),
     );
   }
-
 }
