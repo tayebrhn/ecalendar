@@ -18,12 +18,30 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
     initialPage: EthUtils.initialPage,
   );
 
-  late List<EtDatetime> weekDays;
 
   @override
   void initState() {
     super.initState();
-    weekDays = EthUtils.getWeekDates(_currentDate);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _goToPreviousMonth() {
+    _pageController.previousPage(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _goToNextMonth() {
+    _pageController.nextPage(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -50,15 +68,7 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
-        children: [
-          //
-          _buildHeader(),
-
-          // Weekday headers,
-          _buildWeekdays(),
-
-          Expanded(child: _buildGrid()),
-        ],
+        children: [Expanded(child: _buildGrid())],
       ),
     );
   }
@@ -82,18 +92,18 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
           day: 1,
         );
         return MonthTableView(
-            selectedDate: _currentDate,
-            displayedDate: date,
-            onDateSelected: (newDate) {
-              setState(() {
-                _currentDate = newDate;
-                // Jump to the correct page if needed
-                final diff =
-                    (newDate.year - EtDatetime.now().year) * 12 +
-                    (newDate.month - EtDatetime.now().month);
-                _pageController.jumpToPage(EthUtils.initialPage + diff);
-              });
-            },
+          selectedDate: _currentDate,
+          displayedDate: date,
+          onDateSelected: (newDate) {
+            setState(() {
+              _currentDate = newDate;
+              // Jump to the correct page if needed
+              final diff =
+                  (newDate.year - EtDatetime.now().year) * 12 +
+                  (newDate.month - EtDatetime.now().month);
+              _pageController.jumpToPage(EthUtils.initialPage + diff);
+            });
+          },
         );
       },
     );
@@ -116,7 +126,6 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
                   EtDatetime.now().month + (value - EthUtils.initialPage) % 13,
               day: 1,
             );
-            print("CURRENTVALUE:${value}");
           });
         },
         itemBuilder: (context, index) {
@@ -128,12 +137,125 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
           return MonthlyCalendarView(
             month: _currentDate,
             selectedDate: _selectedtDate,
+            prevMonthCallback: _goToPreviousMonth,
+            nextMonthCallback: _goToNextMonth,
           );
         },
       ),
     );
   }
+}
 
+class MonthlyCalendarView extends StatefulWidget {
+  final EtDatetime month;
+  EtDatetime selectedDate;
+  final VoidCallback prevMonthCallback;
+  final VoidCallback nextMonthCallback;
+
+  MonthlyCalendarView({
+    super.key,
+    required this.month,
+    required this.selectedDate,
+    required this.prevMonthCallback,
+    required this.nextMonthCallback,
+  });
+
+  @override
+  State<MonthlyCalendarView> createState() => _MonthlyCalendarViewState();
+}
+
+class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
+
+  @override
+  Widget build(BuildContext context) {
+    final EtDatetime month = widget.month;
+    EtDatetime? selectedDate = widget.selectedDate;
+    final days = _generateMonthDays(month);
+    final EtDatetime today = EtDatetime.now();
+
+    return Column(
+      children: [
+        //header
+        _buildHeader(),
+        // Weekday headers,
+        _buildWeekdays(),
+        // Full 6-row grid
+        Expanded(
+          child: GridView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(4),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+            ),
+            itemCount: days.length,
+            itemBuilder: (context, index) {
+              final cell = days[index];
+              final isToday = EthUtils.isSameDay(cell.date, today);
+              final isSelected = EthUtils.isSameDay(cell.date, selectedDate);
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    widget.selectedDate = cell.date;
+                  });
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color:
+                        isSelected
+                            ? Colors.blueAccent.withOpacity(0.6)
+                            : isToday
+                            ? Colors.blue[200]
+                            : cell.isCurrentMonth
+                            ? null
+                            : Colors.grey[200],
+                    border: Border.all(color: Colors.grey[300]!),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    '${cell.date.day}',
+                    style: TextStyle(
+                      color: cell.isCurrentMonth ? Colors.black : Colors.grey,
+                      fontWeight:
+                          isSelected || isToday
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+                Expanded(child: Text("Todo Events")),
+      ],
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            onPressed: widget.prevMonthCallback,
+          ),
+          Text(
+            '${widget.month.monthGeez} ${widget.month.year}',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          IconButton(
+            icon: const Icon(Icons.chevron_right),
+            onPressed: widget.nextMonthCallback,
+          ),
+        ],
+      ),
+    );
+  }
   Widget _buildWeekdays() {
     return const Row(
       children: [
@@ -147,54 +269,6 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
       ],
     );
   }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.chevron_left),
-            onPressed:
-                () => _pageController.previousPage(
-                  duration: const Duration(
-                    milliseconds: 300,
-                  ), // Animation duration
-                  curve: Curves.easeInOut, // Animation curve
-                ),
-          ),
-          Text(
-            '${_currentDate.monthGeez} ${_currentDate.year}',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          IconButton(
-            icon: const Icon(Icons.chevron_right),
-            onPressed:
-                () => _pageController.nextPage(
-                  duration: const Duration(
-                    milliseconds: 300,
-                  ), // Animation duration
-                  curve: Curves.easeInOut, // Animation curve
-                ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class MonthlyCalendarView extends StatefulWidget {
-  final EtDatetime month;
-  EtDatetime selectedDate;
-
-  MonthlyCalendarView({super.key, required this.month, required this.selectedDate});
-
-  @override
-  State<MonthlyCalendarView> createState() => _MonthlyCalendarViewState();
-}
-
-class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
   List<_DayCell> _generateMonthDays(EtDatetime month) {
     final firstDay = EtDatetime(year: month.year, month: month.month);
     final startWeekDay = firstDay.weekday % 7;
@@ -250,71 +324,6 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
     ];
 
     return [...leadingDays, ...currentDays, ...trailingDays];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final EtDatetime month = widget.month;
-    EtDatetime? selectedDate = widget.selectedDate;
-    final days = _generateMonthDays(month);
-    final EtDatetime today = EtDatetime.now();
-
-    return Column(
-      children: [
-        // Full 6-row grid
-        Expanded(
-          child: GridView.builder(
-            physics: NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(4),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-            ),
-            itemCount: days.length,
-            itemBuilder: (context, index) {
-              final cell = days[index];
-              final isToday = EthUtils.isSameDay(cell.date, today);
-              final isSelected =
-                  EthUtils.isSameDay(cell.date, selectedDate);
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    widget.selectedDate = cell.date;
-                  });
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color:
-                        isSelected
-                            ? Colors.blueAccent.withOpacity(0.6)
-                            : isToday
-                            ? Colors.blue[200]
-                            : cell.isCurrentMonth
-                            ? null
-                            : Colors.grey[200],
-                    border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    '${cell.date.day}',
-                    style: TextStyle(
-                      color: cell.isCurrentMonth ? Colors.black : Colors.grey,
-                      fontWeight:
-                          isSelected || isToday
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        Column(children: [Text("Todo Events")]),
-      ],
-    );
   }
 }
 
