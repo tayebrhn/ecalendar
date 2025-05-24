@@ -1,7 +1,7 @@
 import 'package:abushakir/abushakir.dart';
-import 'package:eccalendar/month_view.dart';
+import 'package:eccalendar/screens/month_view.dart';
 import 'package:eccalendar/utils/eth_utils.dart';
-import 'package:eccalendar/weekly_view.dart';
+import 'package:eccalendar/screens/weekly_view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

@@ -2,7 +2,7 @@ import 'package:abushakir/abushakir.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import './utils/eth_utils.dart';
+import '../utils/eth_utils.dart';
 
 class EthMonthlyView extends StatefulWidget {
   const EthMonthlyView({super.key});
