@@ -2,6 +2,7 @@ import 'package:abushakir/abushakir.dart';
 import 'package:eccalendar/screens/month_view.dart';
 import 'package:eccalendar/utils/eth_utils.dart';
 import 'package:eccalendar/screens/weekly_view.dart';
+import 'package:eccalendar/utils/themedata_extension.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -21,10 +22,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: CalendarColorScheme.lightColorScheme,
+        useMaterial3: true,
+        extensions: const <ThemeExtension<dynamic>>[CalendarThemeData.light],
       ),
+      darkTheme: ThemeData(
+        colorScheme: CalendarColorScheme.darkColorScheme,
+        useMaterial3: true,
+        extensions: const <ThemeExtension<dynamic>>[CalendarThemeData.dark],
+      ),
+      themeMode: ThemeMode.system,
       home: EthMonthlyView(),
     );
   }
 }
-

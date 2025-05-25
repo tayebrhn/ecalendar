@@ -1,5 +1,7 @@
 import 'package:abushakir/abushakir.dart';
 import 'package:eccalendar/screens/date_details.dart';
+import 'package:eccalendar/utils/calendar_colors.dart';
+import 'package:eccalendar/utils/themedata_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -47,14 +49,24 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
 
   @override
   Widget build(BuildContext context) {
+    final calendarTheme = Theme.of(context).extension<CalendarThemeData>()!;
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
+      backgroundColor: calendarTheme.headerBackgroundColor,
       appBar: AppBar(
+        backgroundColor: calendarTheme.headerBackgroundColor,
+
         title: Text(
           '${_currentDate.monthGeez} ${_currentDate.year}',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: calendarTheme.headerTextColor,
+            fontSize: 24,
+            fontWeight: FontWeight.w400,
+          ),
         ),
         actions: [
           IconButton(
+            color: calendarTheme.headerTextColor,
             icon: Icon(Icons.calendar_today_rounded),
             onPressed: () {
               setState(() {
@@ -72,7 +84,7 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
-        children: [buildWeekdayHeaders(2), Expanded(child: _buildGrid())],
+        children: [_buildWeekdayHeaders(2), Expanded(child: _buildGrid())],
       ),
     );
   }
@@ -149,7 +161,9 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
     );
   }
 
-  Widget buildWeekdayHeaders(int startOfWeek) {
+  Widget _buildWeekdayHeaders(int startOfWeek) {
+    final calendarTheme = Theme.of(context).extension<CalendarThemeData>()!;
+    final colorScheme = Theme.of(context).colorScheme;
     // Generate weekday names starting from custom start day
     final weekdays = List.generate(7, (index) {
       final weekday =
@@ -159,28 +173,41 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
       ).format(DateTime(2023, 1, weekday)); // Any date with known weekday
     });
 
-    return Table(
-      children: [
-        TableRow(
-          children:
-              weekdays
-                  .map(
-                    (day) => Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+    return Container(
+      margin: const EdgeInsets.only( top: 5),
+
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1)),
+        ],
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+        ),
+      ),
+      child: Table(
+        children: [
+          TableRow(
+            children:
+                weekdays
+                    .map(
+                      (day) => Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.all(5.0),
                         child: Text(
                           day,
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[700],
+                            fontWeight: FontWeight.w500,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                       ),
-                    ),
-                  )
-                  .toList(),
-        ),
-      ],
+                    )
+                    .toList(),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -206,10 +233,12 @@ class MonthlyCalendarView extends StatefulWidget {
 class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
   @override
   Widget build(BuildContext context) {
-    final EtDatetime month = widget.month;
-    EtDatetime? selectedDate = widget.selectedDate;
-    final days = _generateMonthDays(month);
-    final EtDatetime today = EtDatetime.now();
+    final calendarTheme = Theme.of(context).extension<CalendarThemeData>()!;
+    final colorScheme = Theme.of(context).colorScheme;
+    // final EtDatetime month = widget.month;
+    // EtDatetime? selectedDate = widget.selectedDate;
+    // final days = _generateMonthDays(month);
+    // final EtDatetime today = EtDatetime.now();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -217,7 +246,29 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Full 6-row grid
-        Table(children: _buildCalendarRows()),
+        Container(
+          margin: const EdgeInsets.only(bottom: 5),
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 2,
+                offset: Offset(0, 1),
+              ),
+            ],
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10),
+            ),
+          ),
+          child: Table(
+            border: TableBorder.symmetric(),
+            children: _buildCalendarRows(),
+          ),
+        ),
+        SizedBox(height: 5),
         Flexible(fit: FlexFit.loose, child: Text("Todo Events")),
       ],
     );
@@ -242,23 +293,24 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
     return rows;
   }
 
-  Widget _buildDayCell(_DayCell date) {
+  Widget _buildDayCell(_DayCell cellDate) {
+    final calendarTheme = Theme.of(context).extension<CalendarThemeData>()!;
+    final colorScheme = Theme.of(context).colorScheme;
     final EtDatetime today = EtDatetime.now();
     EtDatetime? selectedDate = widget.selectedDate;
 
-    final cell = date;
-    final isToday = EthUtils.isSameDay(cell.date, today);
-    final isSelected = EthUtils.isSameDay(cell.date, selectedDate);
+    final isToday = EthUtils.isSameDay(cellDate.date, today);
+    final isSelected = EthUtils.isSameDay(cellDate.date, selectedDate);
     return GestureDetector(
       onTap: () {
         setState(() {
-          widget.selectedDate = cell.date;
+          widget.selectedDate = cellDate.date;
         });
         if (isSelected) {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => EtDateDetails(selectedDate: cell.date),
+              builder: (context) => EtDateDetails(selectedDate: cellDate.date),
             ),
           );
         }
@@ -268,23 +320,30 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
         margin: const EdgeInsets.all(1),
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? Colors.blueAccent.withOpacity(0.6)
-                  : isToday
-                  ? Colors.blue[200]
-                  : cell.isCurrentMonth
-                  ? null
-                  : Colors.grey[200],
-          border: Border.all(color: Colors.grey[300]!),
+          color: isToday ? calendarTheme.todayHighlightColor : null,
+          border: Border.all(
+            color:
+                isSelected
+                    ? calendarTheme.selectedDayColor
+                    : isToday
+                    ? calendarTheme.todayHighlightColor
+                    : Color(0x00000000),
+          ),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Text(
-          '${cell.date.day}',
+          '${cellDate.date.day}',
           style: TextStyle(
-            color: cell.isCurrentMonth ? Colors.black : Colors.grey,
+            color:
+                cellDate.isCurrentMonth
+                    ? colorScheme.primary
+                    : calendarTheme.disabledDayTextColor,
             fontWeight:
-                isSelected || isToday ? FontWeight.bold : FontWeight.normal,
+                isSelected || isToday
+                    ? FontWeight.w800
+                    : cellDate.isCurrentMonth
+                    ? FontWeight.w500
+                    : FontWeight.w400,
           ),
         ),
       ),
