@@ -84,7 +84,34 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
-        children: [_buildWeekdayHeaders(2), Expanded(child: _buildGrid())],
+        children: [
+          Expanded(flex:1,child: _buildWeekdayHeaders(2)),
+          Expanded(
+            flex: 5,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 0, left: 5, right: 5),
+              padding: const EdgeInsets.all(5),
+
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 2,
+                    offset: Offset(0, 1),
+                  ),
+                ],
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
+                ),
+              ),
+              child: _buildGrid(),
+            ),
+          ),
+
+          Expanded(flex: 4, child: Text("Todo Events")),
+        ],
       ),
     );
   }
@@ -126,38 +153,34 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
   }
 
   Widget _buildGrid() {
-    return Expanded(
-      child: PageView.builder(
-        controller: _pageController,
-        scrollDirection: Axis.horizontal,
-        dragStartBehavior: DragStartBehavior.down,
-        pageSnapping: true,
-        scrollBehavior: ScrollBehavior(),
-        onPageChanged: (value) {
-          setState(() {
-            _currentDate = EtDatetime(
-              year:
-                  EtDatetime.now().year + (value - EthUtils.initialPage) ~/ 12,
-              month:
-                  EtDatetime.now().month + (value - EthUtils.initialPage) % 13,
-              day: 1,
-            );
-          });
-        },
-        itemBuilder: (context, index) {
-          // final monthOffset = index - EthUtils.initialPage;
-          // final targetMonth = EtDatetime(
-          //   year: _currentDate.year,
-          //   month: _currentDate.month + monthOffset,
-          // );
-          return MonthlyCalendarView(
-            month: _currentDate,
-            selectedDate: _selectedtDate,
-            // prevMonthCallback: _goToPreviousMonth,
-            // nextMonthCallback: _goToNextMonth,
+    return PageView.builder(
+      controller: _pageController,
+      scrollDirection: Axis.horizontal,
+      dragStartBehavior: DragStartBehavior.down,
+      pageSnapping: true,
+      scrollBehavior: ScrollBehavior(),
+      onPageChanged: (value) {
+        setState(() {
+          _currentDate = EtDatetime(
+            year: EtDatetime.now().year + (value - EthUtils.initialPage) ~/ 12,
+            month: EtDatetime.now().month + (value - EthUtils.initialPage) % 13,
+            day: 1,
           );
-        },
-      ),
+        });
+      },
+      itemBuilder: (context, index) {
+        // final monthOffset = index - EthUtils.initialPage;
+        // final targetMonth = EtDatetime(
+        //   year: _currentDate.year,
+        //   month: _currentDate.month + monthOffset,
+        // );
+        return MonthlyCalendarView(
+          month: _currentDate,
+          selectedDate: _selectedtDate,
+          // prevMonthCallback: _goToPreviousMonth,
+          // nextMonthCallback: _goToNextMonth,
+        );
+      },
     );
   }
 
@@ -174,8 +197,8 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
     });
 
     return Container(
-      margin: const EdgeInsets.only( top: 5),
-
+      margin: const EdgeInsets.only(top: 10,right: 5,left: 5),
+padding: const EdgeInsets.only(top: 20,right: 5,left: 5),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         boxShadow: [
@@ -194,7 +217,6 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
                     .map(
                       (day) => Container(
                         alignment: Alignment.center,
-                        padding: const EdgeInsets.all(5.0),
                         child: Text(
                           day,
                           style: TextStyle(
@@ -239,38 +261,9 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
     // EtDatetime? selectedDate = widget.selectedDate;
     // final days = _generateMonthDays(month);
     // final EtDatetime today = EtDatetime.now();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Full 6-row grid
-        Container(
-          margin: const EdgeInsets.only(bottom: 5),
-          padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 2,
-                offset: Offset(0, 1),
-              ),
-            ],
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10),
-            ),
-          ),
-          child: Table(
-            border: TableBorder.symmetric(),
-            children: _buildCalendarRows(),
-          ),
-        ),
-        SizedBox(height: 5),
-        Flexible(fit: FlexFit.loose, child: Text("Todo Events")),
-      ],
+    return Table(
+      border: TableBorder.symmetric(),
+      children: _buildCalendarRows(),
     );
   }
 
@@ -411,9 +404,8 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
     ];
 
     // Next month
-    final totalCells = (leadingDays.length + currentDays.length) > 35 ? 42 : 35;
     final trailingNeeded =
-        totalCells - (leadingDays.length + currentDays.length);
+        EthUtils.dayGrid - (leadingDays.length + currentDays.length);
     final nextMonth = EtDatetime(year: month.year, month: month.month + 1);
     final trailingDays = [
       for (int d = 1; d <= trailingNeeded; d++)

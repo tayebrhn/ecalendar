@@ -2,7 +2,9 @@ import 'package:abushakir/abushakir.dart';
 
 class EthUtils {
     static const initialPage = 10000;
-static EtDatetime getfirstDayOfWeek(EtDatetime date) {
+    static const int dayGrid = 42;
+
+    static EtDatetime getfirstDayOfWeek(EtDatetime date) {
     return date.subtract(Duration(days: date.weekday - 1));
   }
  static List<EtDatetime> getWeekDates(EtDatetime startOfWeek) {
