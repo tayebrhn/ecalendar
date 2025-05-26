@@ -63,22 +63,47 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
           ),
         ),
         actions: [
-          IconButton(
-            color: calendarTheme.headerTextColor,
-            icon: Icon(Icons.calendar_today_rounded),
-            onPressed: () {
-              setState(() {
-                var newDate = EtDatetime.now();
-                _currentDate = newDate;
-                _selectedtDate = newDate;
+          
+          InkWell(
+            onTap: () {
+                  setState(() {
+                    var newDate = EtDatetime.now();
+                    _currentDate = newDate;
+                    _selectedtDate = newDate;
 
-                // Jump to the correct page if needed
-                final diff =
-                    (newDate.year - EtDatetime.now().year) * 13 +
-                    (newDate.month - EtDatetime.now().month);
-                _pageController.jumpToPage(EthUtils.initialPage + diff);
-              });
-            },
+                    // Jump to the correct page if needed
+                    final diff =
+                        (newDate.year - EtDatetime.now().year) * 13 +
+                        (newDate.month - EtDatetime.now().month);
+                    _pageController.jumpToPage(EthUtils.initialPage + diff);
+                  });
+                },
+                borderRadius: BorderRadius.circular(30),
+            child: Padding( 
+              padding: const EdgeInsets.all(5),
+              child:  Stack(
+              alignment: Alignment.center,
+              children: [
+                const Icon(Icons.calendar_today_rounded,size: 30,),
+                Positioned(
+                  top: 0,
+                  child: Container( 
+                    padding: const EdgeInsets.all(5),
+                    constraints: BoxConstraints(
+                      minWidth: 20,
+                      minHeight: 20
+                    ),
+                    child:Text(
+                    '${EtDatetime.now().day}',
+                    style: TextStyle(
+                      color: calendarTheme.headerTextColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),),
+                ),
+              ],
+            ),),
           ),
         ],
       ),
@@ -302,10 +327,12 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
                 style: TextStyle(
                   color:
                       cellDate.isCurrentMonth
-                          ? isToday?Colors.white: colorScheme.primary
+                          ? isToday
+                              ? Colors.white
+                              : colorScheme.primary
                           : Colors.grey,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 16.5
+                  fontWeight: cellDate.isCurrentMonth?FontWeight.w400:FontWeight.w300,
+                  fontSize: 16.5,
                 ),
               ),
             ),
@@ -319,10 +346,7 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
                 DateTime.fromMillisecondsSinceEpoch(
                   cellDate.date.moment,
                 ).day.toString(),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ),
             cellDate.hasEvents
