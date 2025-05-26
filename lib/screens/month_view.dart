@@ -275,41 +275,73 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
       child: Container(
         alignment: Alignment.center,
         margin: const EdgeInsets.all(1),
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(2),
+        height: 55,
+        width: 65,
         decoration: BoxDecoration(
-          color: isToday ? calendarTheme.todayHighlightColor : null,
           border: Border.all(
             color:
-                isSelected
-                    ? calendarTheme.selectedDayColor
-                    : isToday
-                    ? calendarTheme.todayHighlightColor
-                    : Color(0x00000000),
+                isSelected ? calendarTheme.selectedDayColor : Color(0x00000000),
           ),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+
           children: [
-            Text(
-              '${cellDate.date.day}',
-              style: TextStyle(
-                color:
-                    cellDate.isCurrentMonth
-                        ? colorScheme.primary
-                        : calendarTheme.disabledDayTextColor,
-                fontWeight:
-                    isSelected || isToday
-                        ? FontWeight.w800
-                        : cellDate.isCurrentMonth
-                        ? FontWeight.w500
-                        : FontWeight.w400,
+            Container(
+              alignment: Alignment.center,
+              // margin: const EdgeInsets.only(top: 2),
+              decoration: BoxDecoration(
+                color: isToday ? Colors.cyan : null,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              width: 25,
+              child: Text(
+                '${cellDate.date.day}',
+                style: TextStyle(
+                  color:
+                      cellDate.isCurrentMonth
+                          ? isToday?Colors.white: colorScheme.primary
+                          : Colors.grey,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 16.5
+                ),
               ),
             ),
-            if (cellDate.hasEvents)
-              Container(margin: const EdgeInsets.only(top: 2),width: 6,height: 6,decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.cyan
-              ),),
+
+            Container(
+              alignment: Alignment.bottomRight,
+              margin: const EdgeInsets.only(top: 0),
+              // width: 6,
+              // height: 6,
+              child: Text(
+                DateTime.fromMillisecondsSinceEpoch(
+                  cellDate.date.moment,
+                ).day.toString(),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+            cellDate.hasEvents
+                ? Container(
+                  alignment: Alignment.bottomLeft,
+                  // margin: const EdgeInsets.only(top: 2),
+                  width: 50,
+                  height: 2,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    color: Colors.blue,
+                  ),
+                )
+                : Container(
+                  alignment: Alignment.bottomLeft,
+                  margin: const EdgeInsets.only(top: 2),
+                  width: 50,
+                  height: 2,
+                ),
           ],
         ),
       ),
