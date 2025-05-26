@@ -1,8 +1,6 @@
 import 'package:abushakir/abushakir.dart';
 import 'package:eccalendar/screens/date_details.dart';
-import 'package:eccalendar/utils/calendar_colors.dart';
 import 'package:eccalendar/utils/themedata_extension.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -72,6 +70,8 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
               setState(() {
                 var newDate = EtDatetime.now();
                 _currentDate = newDate;
+                _selectedtDate = newDate;
+
                 // Jump to the correct page if needed
                 final diff =
                     (newDate.year - EtDatetime.now().year) * 13 +
@@ -85,7 +85,7 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          Expanded(flex:1,child: _buildWeekdayHeaders(2)),
+          Expanded(flex: 1, child: _buildWeekdayHeaders(2)),
           Expanded(
             flex: 5,
             child: Container(
@@ -110,45 +110,14 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
             ),
           ),
 
-          Expanded(flex: 4, child: Text("Todo Events")),
+          Expanded(
+            flex: 4,
+            child: Text(
+              '$_selectedtDate : ${EthUtils.dayEvent(_selectedtDate).toString()}',
+            ),
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _tableGrid() {
-    return PageView.builder(
-      controller: _pageController,
-      onPageChanged: (value) {
-        setState(() {
-          _currentDate = EtDatetime(
-            year: EtDatetime.now().year + (value - EthUtils.initialPage) ~/ 12,
-            month: EtDatetime.now().month + (value - EthUtils.initialPage) % 12,
-            day: 1,
-          );
-        });
-      },
-      itemBuilder: (context, index) {
-        final date = EtDatetime(
-          year: EtDatetime.now().year + (index - EthUtils.initialPage) ~/ 12,
-          month: EtDatetime.now().month + (index - EthUtils.initialPage) % 12,
-          day: 1,
-        );
-        return MonthTableView(
-          selectedDate: _currentDate,
-          displayedDate: date,
-          onDateSelected: (newDate) {
-            setState(() {
-              _currentDate = newDate;
-              // Jump to the correct page if needed
-              final diff =
-                  (newDate.year - EtDatetime.now().year) * 12 +
-                  (newDate.month - EtDatetime.now().month);
-              _pageController.jumpToPage(EthUtils.initialPage + diff);
-            });
-          },
-        );
-      },
     );
   }
 
@@ -158,6 +127,7 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
       scrollDirection: Axis.horizontal,
       dragStartBehavior: DragStartBehavior.down,
       pageSnapping: true,
+      key: ValueKey(_currentDate.month),
       scrollBehavior: ScrollBehavior(),
       onPageChanged: (value) {
         setState(() {
@@ -169,14 +139,13 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
         });
       },
       itemBuilder: (context, index) {
-        // final monthOffset = index - EthUtils.initialPage;
-        // final targetMonth = EtDatetime(
-        //   year: _currentDate.year,
-        //   month: _currentDate.month + monthOffset,
-        // );
         return MonthlyCalendarView(
           month: _currentDate,
-          selectedDate: _selectedtDate,
+          onDateSelected: (EtDatetime date) {
+            setState(() {
+              _selectedtDate = date;
+            });
+          },
           // prevMonthCallback: _goToPreviousMonth,
           // nextMonthCallback: _goToNextMonth,
         );
@@ -197,8 +166,8 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
     });
 
     return Container(
-      margin: const EdgeInsets.only(top: 10,right: 5,left: 5),
-padding: const EdgeInsets.only(top: 20,right: 5,left: 5),
+      margin: const EdgeInsets.only(top: 10, right: 5, left: 5),
+      padding: const EdgeInsets.only(top: 20, right: 5, left: 5),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         boxShadow: [
@@ -236,14 +205,14 @@ padding: const EdgeInsets.only(top: 20,right: 5,left: 5),
 
 class MonthlyCalendarView extends StatefulWidget {
   final EtDatetime month;
-  EtDatetime selectedDate;
+  final void Function(EtDatetime date) onDateSelected;
   // final VoidCallback prevMonthCallback;
   // final VoidCallback nextMonthCallback;
 
   MonthlyCalendarView({
     super.key,
     required this.month,
-    required this.selectedDate,
+    required this.onDateSelected,
     // required this.prevMonthCallback,
     // required this.nextMonthCallback,
   });
@@ -253,14 +222,10 @@ class MonthlyCalendarView extends StatefulWidget {
 }
 
 class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
+  EtDatetime selectedDate = EtDatetime.now();
+
   @override
   Widget build(BuildContext context) {
-    final calendarTheme = Theme.of(context).extension<CalendarThemeData>()!;
-    final colorScheme = Theme.of(context).colorScheme;
-    // final EtDatetime month = widget.month;
-    // EtDatetime? selectedDate = widget.selectedDate;
-    // final days = _generateMonthDays(month);
-    // final EtDatetime today = EtDatetime.now();
     return Table(
       border: TableBorder.symmetric(),
       children: _buildCalendarRows(),
@@ -270,7 +235,6 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
   List<TableRow> _buildCalendarRows() {
     // Create list of days to display (including leading/trailing days from other months)
     final List<_DayCell> days = _generateMonthDays(widget.month);
-
     // Build table rows
     final rows = <TableRow>[];
 
@@ -289,16 +253,16 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
   Widget _buildDayCell(_DayCell cellDate) {
     final calendarTheme = Theme.of(context).extension<CalendarThemeData>()!;
     final colorScheme = Theme.of(context).colorScheme;
-    final EtDatetime today = EtDatetime.now();
-    EtDatetime? selectedDate = widget.selectedDate;
 
+    final EtDatetime today = EtDatetime.now();
     final isToday = EthUtils.isSameDay(cellDate.date, today);
     final isSelected = EthUtils.isSameDay(cellDate.date, selectedDate);
     return GestureDetector(
       onTap: () {
         setState(() {
-          widget.selectedDate = cellDate.date;
+          selectedDate = cellDate.date;
         });
+        widget.onDateSelected.call(selectedDate);
         if (isSelected) {
           Navigator.push(
             context,
@@ -324,47 +288,33 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
           ),
           borderRadius: BorderRadius.circular(6),
         ),
-        child: Text(
-          '${cellDate.date.day}',
-          style: TextStyle(
-            color:
-                cellDate.isCurrentMonth
-                    ? colorScheme.primary
-                    : calendarTheme.disabledDayTextColor,
-            fontWeight:
-                isSelected || isToday
-                    ? FontWeight.w800
-                    : cellDate.isCurrentMonth
-                    ? FontWeight.w500
-                    : FontWeight.w400,
-          ),
+        child: Column(
+          children: [
+            Text(
+              '${cellDate.date.day}',
+              style: TextStyle(
+                color:
+                    cellDate.isCurrentMonth
+                        ? colorScheme.primary
+                        : calendarTheme.disabledDayTextColor,
+                fontWeight:
+                    isSelected || isToday
+                        ? FontWeight.w800
+                        : cellDate.isCurrentMonth
+                        ? FontWeight.w500
+                        : FontWeight.w400,
+              ),
+            ),
+            if (cellDate.hasEvents)
+              Container(margin: const EdgeInsets.only(top: 2),width: 6,height: 6,decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.cyan
+              ),),
+          ],
         ),
       ),
     );
   }
-
-  // Widget _buildHeader() {
-  //   return Padding(
-  //     padding: const EdgeInsets.all(16.0),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //       children: [
-  //         IconButton(
-  //           icon: const Icon(Icons.chevron_left),
-  //           onPressed: widget.prevMonthCallback,
-  //         ),
-  //         Text(
-  //           '${widget.month.monthGeez} ${widget.month.year}',
-  //           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-  //         ),
-  //         IconButton(
-  //           icon: const Icon(Icons.chevron_right),
-  //           onPressed: widget.nextMonthCallback,
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   List<_DayCell> _generateMonthDays(EtDatetime month) {
     final firstDay = EtDatetime(year: month.year, month: month.month);
@@ -393,7 +343,6 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
           isCurrentMonth: false,
         ),
     ];
-
     //current month
     final currentDays = [
       for (int d = 1; d <= totalDays; d++)
@@ -402,7 +351,6 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
           isCurrentMonth: true,
         ),
     ];
-
     // Next month
     final trailingNeeded =
         EthUtils.dayGrid - (leadingDays.length + currentDays.length);
@@ -418,126 +366,22 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
           isCurrentMonth: false,
         ),
     ];
-
     return [...leadingDays, ...currentDays, ...trailingDays];
   }
+}
+
+List loadEvents(List<_DayCell> dayCells) {
+  return dayCells.map((element) {
+    return EthUtils.dayEvent(element.date);
+  }).toList();
 }
 
 class _DayCell {
   final EtDatetime date;
   final bool isCurrentMonth;
-
   _DayCell({required this.date, required this.isCurrentMonth});
-}
-
-class MonthTableView extends StatelessWidget {
-  final EtDatetime selectedDate;
-  final EtDatetime displayedDate;
-  final ValueChanged<EtDatetime> onDateSelected;
-
-  const MonthTableView({
-    super.key,
-    required this.selectedDate,
-    required this.displayedDate,
-    required this.onDateSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Table(children: _buildCalendarRows());
-  }
-
-  List<TableRow> _buildCalendarRows() {
-    final year = displayedDate.year;
-    final month = displayedDate.month;
-    final firstDay = EtDatetime(year: year, month: month, day: 1);
-    final daysInMonth = firstDay.days;
-
-    // Calculate weekday of first day (1 = Monday, 7 = Sunday)
-    final firstWeekday = firstDay.weekday;
-
-    // Create list of days to display (including leading/trailing days from other months)
-    final days = <EtDatetime>[];
-
-    // Add leading days from previous month if needed
-    if (firstWeekday != 1) {
-      final previousMonth = EtDatetime(year: year, month: month - 1, day: 1);
-      final daysInPreviousMonth = previousMonth.days;
-
-      for (
-        var i = daysInPreviousMonth - (firstWeekday - 2);
-        i <= daysInPreviousMonth;
-        i++
-      ) {
-        days.add(EtDatetime(year: year, month: month - 1, day: i));
-      }
-    }
-
-    // Add current month days
-    for (var i = 1; i <= daysInMonth; i++) {
-      days.add(EtDatetime(year: year, month: month, day: i));
-    }
-
-    // Add trailing days from next month if needed
-    final totalCells = days.length > 35 ? 42 : 35; // 6 or 5 weeks
-    final emptyCell = totalCells - days.length;
-    for (int i = 1; i <= emptyCell; i++) {
-      days.add(EtDatetime(year: year, month: month + 1, day: i));
-    }
-
-    // Build table rows
-    final rows = <TableRow>[];
-
-    // Add day cells
-    for (var i = 0; i < days.length; i += 7) {
-      final week = days.sublist(i, i + 7);
-
-      rows.add(
-        TableRow(children: week.map((date) => _buildDayCell(date)).toList()),
-      );
-    }
-
-    return rows;
-  }
-
-  Widget _buildDayCell(EtDatetime date) {
-    final isCurrentMonth = date.month == displayedDate.month;
-    final isSelected =
-        date.day == selectedDate.day &&
-        date.month == selectedDate.month &&
-        date.year == selectedDate.year;
-    final isToday =
-        date.day == EtDatetime.now().day &&
-        date.month == EtDatetime.now().month &&
-        date.year == EtDatetime.now().year;
-
-    return GestureDetector(
-      onTap: () => onDateSelected(date),
-      child: Container(
-        margin: const EdgeInsets.all(1),
-        padding: const EdgeInsets.all(8),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? Colors.blueAccent
-                  : isToday
-                  ? Colors.blue[200]
-                  : Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: Colors.grey[300]!),
-        ),
-        child: Center(
-          child: Text(
-            '${date.day}',
-            style: TextStyle(
-              color: isCurrentMonth ? Colors.black : Colors.grey,
-              fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ),
-      ),
-    );
+  bool get hasEvents {
+    return EthUtils.dayEvent(date).isNotEmpty;
   }
 }
 

@@ -18,5 +18,13 @@ static bool isSameDay(EtDatetime a, EtDatetime b) {
   return a.year == b.year && a.month == b.month && a.day == b.day;
 }
 
+static List dayEvent(EtDatetime date) {  
+  return BahireHasab(year: date.year).allAtswamat.where((element) {
+    return element['day']['date'] == date.day && element['day']['month'] == date.monthGeez;
+  }).toList();
+}
+
+
+
 }
 
