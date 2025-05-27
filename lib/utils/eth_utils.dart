@@ -17,6 +17,12 @@ static List<EtDatetime> getMonthDates(EtDatetime startOfWeek) {
 static bool isSameDay(EtDatetime a, EtDatetime b) {
   return a.year == b.year && a.month == b.month && a.day == b.day;
 }
+static bool isToday (EtDatetime day){
+  final EtDatetime now = EtDatetime.now();
+  return day.year == now.year && day.month == now.month && day.day == now.day;
+  
+
+}
 
 static List dayEvent(EtDatetime date) {  
   return BahireHasab(year: date.year).allAtswamat.where((element) {

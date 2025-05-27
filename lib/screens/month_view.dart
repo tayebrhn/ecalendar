@@ -7,14 +7,16 @@ import 'package:intl/intl.dart';
 import '../utils/eth_utils.dart';
 
 class EthMonthlyView extends StatefulWidget {
-  const EthMonthlyView({super.key});
+  EtDatetime month = EtDatetime.now();
+  final void Function(EtDatetime date) onPageChanged;
+
+  EthMonthlyView({super.key, required month, required this.onPageChanged});
   @override
   _EthMonthlyViewState createState() => _EthMonthlyViewState();
 }
 
 class _EthMonthlyViewState extends State<EthMonthlyView> {
-  EtDatetime _currentDate = EtDatetime.now();
-  EtDatetime _selectedtDate = EtDatetime.now();
+  EtDatetime _selectedtDate = EtDatetime.now(); //
 
   late final PageController _pageController = PageController(
     initialPage: EthUtils.initialPage,
@@ -49,132 +51,78 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
   Widget build(BuildContext context) {
     final calendarTheme = Theme.of(context).extension<CalendarThemeData>()!;
     final colorScheme = Theme.of(context).colorScheme;
-    return Scaffold(
-      backgroundColor: calendarTheme.headerBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: calendarTheme.headerBackgroundColor,
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Expanded(flex: 1, child: _buildWeekdayHeaders(2)),
+        Expanded(
+          flex: 5,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 0, left: 5, right: 5),
+            padding: const EdgeInsets.all(5),
 
-        title: Text(
-          '${_currentDate.monthGeez} ${_currentDate.year}',
-          style: TextStyle(
-            color: calendarTheme.headerTextColor,
-            fontSize: 24,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        actions: [
-          
-          InkWell(
-            onTap: () {
-                  setState(() {
-                    var newDate = EtDatetime.now();
-                    _currentDate = newDate;
-                    _selectedtDate = newDate;
-
-                    // Jump to the correct page if needed
-                    final diff =
-                        (newDate.year - EtDatetime.now().year) * 13 +
-                        (newDate.month - EtDatetime.now().month);
-                    _pageController.jumpToPage(EthUtils.initialPage + diff);
-                  });
-                },
-                borderRadius: BorderRadius.circular(30),
-            child: Padding( 
-              padding: const EdgeInsets.all(5),
-              child:  Stack(
-              alignment: Alignment.center,
-              children: [
-                const Icon(Icons.calendar_today_rounded,size: 30,),
-                Positioned(
-                  top: 0,
-                  child: Container( 
-                    padding: const EdgeInsets.all(5),
-                    constraints: BoxConstraints(
-                      minWidth: 20,
-                      minHeight: 20
-                    ),
-                    child:Text(
-                    '${EtDatetime.now().day}',
-                    style: TextStyle(
-                      color: calendarTheme.headerTextColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 2,
+                  offset: Offset(0, 1),
                 ),
               ],
-            ),),
-          ),
-        ],
-      ),
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Expanded(flex: 1, child: _buildWeekdayHeaders(2)),
-          Expanded(
-            flex: 5,
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 0, left: 5, right: 5),
-              padding: const EdgeInsets.all(5),
-
-              decoration: BoxDecoration(
-                color: colorScheme.surface,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 2,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
-                ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10),
               ),
-              child: _buildGrid(),
+            ),
+            child: PageView.builder(
+              controller: _pageController,
+              scrollDirection: Axis.horizontal,
+              dragStartBehavior: DragStartBehavior.down,
+              pageSnapping: true,
+              key: ValueKey(widget.month.month),
+              scrollBehavior: ScrollBehavior(),
+              onPageChanged: (value) {
+                setState(() {
+                  widget.onPageChanged(widget.month);
+                  print("DAY:${value}");
+                });
+              },
+              itemBuilder: (context, index) {
+                widget.month = EtDatetime(
+                  year:
+                      EtDatetime.now().year +
+                      (index - EthUtils.initialPage) ~/ 12,
+                  month:
+                      EtDatetime.now().month +
+                      (index - EthUtils.initialPage) % 13,
+                  day: 1,
+                );
+
+                print("DAY2INDEX:${widget.month}");
+
+                return MonthlyCalendarView(
+                  month: widget.month,
+                  onDateSelected: (EtDatetime date) {
+                    setState(() {
+                      _selectedtDate = date;
+                    });
+                  },
+                  // prevMonthCallback: _goToPreviousMonth,
+                  // nextMonthCallback: _goToNextMonth,
+                );
+              },
             ),
           ),
+        ),
 
-          Expanded(
-            flex: 4,
-            child: Text(
-              '$_selectedtDate : ${EthUtils.dayEvent(_selectedtDate).toString()}',
-            ),
+        Expanded(
+          flex: 4,
+          child: Text(
+            '$_selectedtDate : ${EthUtils.dayEvent(_selectedtDate).toString()}',
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGrid() {
-    return PageView.builder(
-      controller: _pageController,
-      scrollDirection: Axis.horizontal,
-      dragStartBehavior: DragStartBehavior.down,
-      pageSnapping: true,
-      key: ValueKey(_currentDate.month),
-      scrollBehavior: ScrollBehavior(),
-      onPageChanged: (value) {
-        setState(() {
-          _currentDate = EtDatetime(
-            year: EtDatetime.now().year + (value - EthUtils.initialPage) ~/ 12,
-            month: EtDatetime.now().month + (value - EthUtils.initialPage) % 13,
-            day: 1,
-          );
-        });
-      },
-      itemBuilder: (context, index) {
-        return MonthlyCalendarView(
-          month: _currentDate,
-          onDateSelected: (EtDatetime date) {
-            setState(() {
-              _selectedtDate = date;
-            });
-          },
-          // prevMonthCallback: _goToPreviousMonth,
-          // nextMonthCallback: _goToNextMonth,
-        );
-      },
+        ),
+      ],
     );
   }
 
@@ -287,7 +235,7 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
         setState(() {
           selectedDate = cellDate.date;
         });
-        widget.onDateSelected.call(selectedDate);
+        // widget.onDateSelected(selectedDate);
         if (isSelected) {
           Navigator.push(
             context,
@@ -331,7 +279,10 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
                               ? Colors.white
                               : colorScheme.primary
                           : Colors.grey,
-                  fontWeight: cellDate.isCurrentMonth?FontWeight.w400:FontWeight.w300,
+                  fontWeight:
+                      cellDate.isCurrentMonth
+                          ? FontWeight.w400
+                          : FontWeight.w300,
                   fontSize: 16.5,
                 ),
               ),
@@ -441,8 +392,8 @@ class _DayCell {
   }
 }
 
-extension on EtDatetime {
-  int get days {
-    return ETC(year: year, month: month).monthDays().length;
-  }
-}
+// extension on EtDatetime {
+//   int get days {
+//     return ETC(year: year, month: month).monthDays().length;
+//   }
+// }
