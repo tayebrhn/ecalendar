@@ -1,12 +1,21 @@
 import 'package:abushakir/abushakir.dart';
 import 'package:eccalendar/screens/month_view.dart';
-import 'package:eccalendar/screens/weekly_view.dart';
+import 'package:eccalendar/state/state_manager.dart';
 import 'package:eccalendar/utils/themedata_extension.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<DateChangeNotifier>(
+          create: (context) => DateChangeNotifier(),
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -48,7 +57,6 @@ class _MainLayoutState extends State<MainLayout> {
   final Duration duration = Duration(milliseconds: 300);
 
   EtDatetime _currentDate = EtDatetime.now();
-  EtDatetime _selectedtDate = EtDatetime.now();
 
   @override
   void initState() {
@@ -88,11 +96,11 @@ class _MainLayoutState extends State<MainLayout> {
       case PageType.month:
         return EthMonthlyView(
           month: _currentDate,
-          onPageChanged: (EtDatetime month) {
-            setState(() {
-              _currentDate = month;
-            });
-          },
+          // onPageChanged: (EtDatetime month) {
+          //   setState(() {
+          //     _currentDate = month;
+          //   });
+          // },
           // prevMonthCallback: _goToPreviousMonth,
           // nextMonthCallback: _goToNextMonth,
         );
@@ -111,6 +119,8 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     final calendarTheme = Theme.of(context).extension<CalendarThemeData>()!;
     final colorScheme = Theme.of(context).colorScheme;
+    _currentDate =
+        Provider.of<DateChangeNotifier>(context, listen: false).changeDate;
     return Scaffold(
       body: Stack(
         children: [
@@ -155,30 +165,46 @@ class _MainLayoutState extends State<MainLayout> {
                   backgroundColor: calendarTheme.headerBackgroundColor,
                   leading: IconButton(
                     icon: Icon(Icons.menu),
-                    onPressed: () => setState(() => isSidebarOpen?isSidebarOpen = false:isSidebarOpen = true),
+                    onPressed:
+                        () => setState(
+                          () =>
+                              isSidebarOpen
+                                  ? isSidebarOpen = false
+                                  : isSidebarOpen = true,
+                        ),
                   ),
-                  title: Text(
-                    '${_currentDate.monthGeez} ${_currentDate.year}',
-                    style: TextStyle(
-                      color: calendarTheme.headerTextColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  title: Consumer<DateChangeNotifier>(
+                    builder: (context, value, child) {
+                      return Text(
+                        '${value.changeDate.monthGeez} ${value.changeDate.year}',
+                        style: TextStyle(
+                          color: calendarTheme.headerTextColor,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      );
+                    },
                   ),
                   actions: [
                     InkWell(
                       onTap: () {
-                        setState(() {
-                          var newDate = EtDatetime.now();
-                          _currentDate = newDate;
-                          _selectedtDate = newDate;
+                        // Provider.of<DateChangeNotifier>(context, listen: false)
+                        //     .changeDate = EtDatetime.now();
+                        Provider.of<DateChangeNotifier>(
+                          context,
+                          listen: false,
+                        ).jumpToDay();
 
-                          // // Jump to the correct page if needed
-                          // final diff =
-                          //     (newDate.year - EtDatetime.now().year) * 13 +
-                          //     (newDate.month - EtDatetime.now().month);
-                          // _pageController.jumpToPage(EthUtils.initialPage + diff);
-                        });
+                        // setState(() {
+                        // var newDate = EtDatetime.now();
+                        // _currentDate = newDate;
+                        // _selectedtDate = newDate;
+                        // // Jump to the correct page if needed
+                        // final diff =
+                        //     (newDate.year - EtDatetime.now().year) * 13 +
+                        //     (newDate.month - EtDatetime.now().month);
+                        // _pageController.jumpToPage(EthUtils.initialPage + diff);
+                        //});
                       },
                       borderRadius: BorderRadius.circular(30),
                       child: Padding(

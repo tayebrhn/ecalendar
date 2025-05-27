@@ -1,28 +1,30 @@
 import 'package:abushakir/abushakir.dart';
 import 'package:eccalendar/screens/date_details.dart';
+import 'package:eccalendar/state/state_manager.dart';
 import 'package:eccalendar/utils/themedata_extension.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../utils/eth_utils.dart';
 
-ValueNotifier<EtDatetime> selectedSharedDate = ValueNotifier<EtDatetime>(EtDatetime.now());
 
 class EthMonthlyView extends StatefulWidget {
   EtDatetime month = EtDatetime.now();
-  final void Function(EtDatetime date) onPageChanged;
+  // final void Function(EtDatetime date) onPageChanged;
 
-  EthMonthlyView({super.key, required month, required this.onPageChanged});
+  EthMonthlyView({super.key, required month, 
+  // required this.onPageChanged
+  });
   @override
   _EthMonthlyViewState createState() => _EthMonthlyViewState();
 }
 
 class _EthMonthlyViewState extends State<EthMonthlyView> {
-  EtDatetime _selectedtDate = EtDatetime.now(); //
 
-  late final PageController _pageController = PageController(
-    initialPage: EthUtils.initialPage,
-  );
+  // late final PageController _pageController = PageController(
+  //   initialPage: EthUtils.initialPage,
+  // );
 
   @override
   void initState() {
@@ -31,26 +33,27 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
 
   @override
   void dispose() {
-    _pageController.dispose();
+    // _pageController.dispose();
     super.dispose();
   }
 
-  void _goToPreviousMonth() {
-    _pageController.previousPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
+  // void _goToPreviousMonth() {
+  //   _pageController.previousPage(
+  //     duration: const Duration(milliseconds: 300),
+  //     curve: Curves.easeInOut,
+  //   );
+  // }
 
-  void _goToNextMonth() {
-    _pageController.nextPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
+  // void _goToNextMonth() {
+  //   _pageController.nextPage(
+  //     duration: const Duration(milliseconds: 300),
+  //     curve: Curves.easeInOut,
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final pageManager = Provider.of<DateChangeNotifier>(context, listen: false).pageController;
     final calendarTheme = Theme.of(context).extension<CalendarThemeData>()!;
     final colorScheme = Theme.of(context).colorScheme;
     return Column(
@@ -78,37 +81,50 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
               ),
             ),
             child: PageView.builder(
-              controller: _pageController,
+              controller: pageManager,
               scrollDirection: Axis.horizontal,
               dragStartBehavior: DragStartBehavior.down,
               pageSnapping: true,
               key: ValueKey(widget.month.month),
               scrollBehavior: ScrollBehavior(),
               onPageChanged: (value) {
-                setState(() {
-                  widget.onPageChanged(widget.month);
-                });
-              },
-              itemBuilder: (context, index) {
+                // setState(() {
+                //   widget.onPageChanged(widget.month);
+                // });
+
                 widget.month = EtDatetime(
                   year:
                       EtDatetime.now().year +
-                      (index - EthUtils.initialPage) ~/ 12,
+                      (value - EthUtils.initialPage) ~/ 13,
+                  month:
+                      EtDatetime.now().month +
+                      (value - EthUtils.initialPage) % 13,
+                  day: 1,
+                );
+                Provider.of<DateChangeNotifier>(context, listen: false).currentPageIndex = value;
+                Provider.of<DateChangeNotifier>(context, listen: false).changeDate=widget.month;
+                print('INDEXDAY: ${widget.month}');
+                print('INDEXValue: ${value}');
+              },
+              itemBuilder: (context, index) {
+
+                widget.month = EtDatetime(
+                  year:
+                      EtDatetime.now().year +
+                      (index - EthUtils.initialPage) ~/ 13,
                   month:
                       EtDatetime.now().month +
                       (index - EthUtils.initialPage) % 13,
                   day: 1,
                 );
 
-                print("DAY2INDEX:${widget.month}");
-
                 return MonthlyCalendarView(
                   month: widget.month,
-                  onDateSelected: (EtDatetime date) {
-                    setState(() {
-                      _selectedtDate = date;
-                    });
-                  },
+                  // onDateSelected: (EtDatetime date) {
+                  //   setState(() {
+                  //     _selectedtDate = date;
+                  //   });
+                  // },
                   // prevMonthCallback: _goToPreviousMonth,
                   // nextMonthCallback: _goToNextMonth,
                 );
@@ -117,16 +133,13 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
           ),
         ),
 
-        Expanded(
-          flex: 4,
-          child: ValueListenableBuilder<EtDatetime>(
-            valueListenable: selectedSharedDate,
-            builder: (context, value, _) {
-              return Text(
-            '$selectedSharedDate : ${EthUtils.dayEvent(selectedSharedDate.value).toString()}',
-          );
-            },
-          ),
+        Consumer<DateChangeNotifier>(
+          builder: (context, value, child) {
+            return Expanded(
+              flex: 4,
+              child: Text('${value.selectedDate} : ${EthUtils.dayEvent(value.selectedDate).toString()}'),
+            );
+          },
         ),
       ],
     );
@@ -184,14 +197,14 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
 
 class MonthlyCalendarView extends StatefulWidget {
   final EtDatetime month;
-  final void Function(EtDatetime date) onDateSelected;
+  // final void Function(EtDatetime date) onDateSelected;
   // final VoidCallback prevMonthCallback;
   // final VoidCallback nextMonthCallback;
 
-  MonthlyCalendarView({
+  const MonthlyCalendarView({
     super.key,
     required this.month,
-    required this.onDateSelected,
+    // required this.onDateSelected,
     // required this.prevMonthCallback,
     // required this.nextMonthCallback,
   });
@@ -235,12 +248,14 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
 
     final EtDatetime today = EtDatetime.now();
     final isToday = EthUtils.isSameDay(cellDate.date, today);
-    final isSelected = EthUtils.isSameDay(cellDate.date, selectedSharedDate.value);
+    final isSelected = EthUtils.isSameDay(
+      cellDate.date,
+      Provider.of<DateChangeNotifier>(context, listen: true).selectedDate,
+    );
     return GestureDetector(
       onTap: () {
-          selectedSharedDate.value = cellDate.date;
-          print("SHARED:${selectedSharedDate.value}\nSELECTED:${cellDate.date}");
-        // widget.onDateSelected(selectedDate);
+        Provider.of<DateChangeNotifier>(context, listen: false).selectedDate =
+            cellDate.date;
         if (isSelected) {
           Navigator.push(
             context,
