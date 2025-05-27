@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-enum PageType { year, month, week, day, convert, settings }
+enum PageType { year, month, convert, settings }
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -96,10 +96,6 @@ class _MainLayoutState extends State<MainLayout> {
           // prevMonthCallback: _goToPreviousMonth,
           // nextMonthCallback: _goToNextMonth,
         );
-      case PageType.week:
-        return EthWeeklyView();
-      case PageType.day:
-        return Center(child: Text("Day Page", style: TextStyle(fontSize: 24)));
       case PageType.convert:
         return Center(
           child: Text("Convert Page", style: TextStyle(fontSize: 24)),
@@ -132,8 +128,6 @@ class _MainLayoutState extends State<MainLayout> {
                   SizedBox(height: 100),
                   buildMenuItem("Year", PageType.year),
                   buildMenuItem("Month", PageType.month),
-                  buildMenuItem("Week", PageType.week),
-                  buildMenuItem("Day", PageType.day),
                   buildMenuItem("Convert", PageType.convert),
                   buildMenuItem("Settings", PageType.settings),
                   Spacer(),

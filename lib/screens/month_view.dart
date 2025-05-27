@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../utils/eth_utils.dart';
 
+ValueNotifier<EtDatetime> selectedSharedDate = ValueNotifier<EtDatetime>(EtDatetime.now());
+
 class EthMonthlyView extends StatefulWidget {
   EtDatetime month = EtDatetime.now();
   final void Function(EtDatetime date) onPageChanged;
@@ -85,7 +87,6 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
               onPageChanged: (value) {
                 setState(() {
                   widget.onPageChanged(widget.month);
-                  print("DAY:${value}");
                 });
               },
               itemBuilder: (context, index) {
@@ -118,8 +119,13 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
 
         Expanded(
           flex: 4,
-          child: Text(
-            '$_selectedtDate : ${EthUtils.dayEvent(_selectedtDate).toString()}',
+          child: ValueListenableBuilder<EtDatetime>(
+            valueListenable: selectedSharedDate,
+            builder: (context, value, _) {
+              return Text(
+            '$selectedSharedDate : ${EthUtils.dayEvent(selectedSharedDate.value).toString()}',
+          );
+            },
           ),
         ),
       ],
@@ -229,12 +235,11 @@ class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
 
     final EtDatetime today = EtDatetime.now();
     final isToday = EthUtils.isSameDay(cellDate.date, today);
-    final isSelected = EthUtils.isSameDay(cellDate.date, selectedDate);
+    final isSelected = EthUtils.isSameDay(cellDate.date, selectedSharedDate.value);
     return GestureDetector(
       onTap: () {
-        setState(() {
-          selectedDate = cellDate.date;
-        });
+          selectedSharedDate.value = cellDate.date;
+          print("SHARED:${selectedSharedDate.value}\nSELECTED:${cellDate.date}");
         // widget.onDateSelected(selectedDate);
         if (isSelected) {
           Navigator.push(
