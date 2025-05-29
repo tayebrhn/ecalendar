@@ -116,8 +116,8 @@ class PageProvider with ChangeNotifier {
   void switchPage(PageType page) async {
     if (_currentPage != page) {
       _isSidebarOpen = false;
-      // notifyListeners();
-      // await Future.delayed(Duration(milliseconds: 300));
+      notifyListeners();
+      await Future.delayed(Duration(milliseconds: 300));
       _currentPage = page;
       notifyListeners();
     } else {

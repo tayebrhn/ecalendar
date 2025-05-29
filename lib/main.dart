@@ -1,4 +1,3 @@
-import 'package:abushakir/abushakir.dart';
 import 'package:eccalendar/screens/month_screen.dart';
 import 'package:eccalendar/state/state_manager.dart';
 import 'package:eccalendar/utils/themedata_extension.dart';

@@ -20,8 +20,6 @@ class CalendarColorScheme {
     onError: Color(0xFFFFFFFF),
     errorContainer: Color(0xFFF9DEDC),
     onErrorContainer: Color(0xFF410E0B),
-    background: Color(0xFFFFFBFE),
-    onBackground: Color(0xFF1C1B1F),
     surface: Color(0xFFFFFBFE),
     onSurface: Color(0xFF1C1B1F),
     surfaceContainerHighest: Color(0xFFE7E0EC),

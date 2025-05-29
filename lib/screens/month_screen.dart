@@ -206,7 +206,7 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
           ),
 
           Expanded(
-            flex: 4,
+            flex: 2,
             child: Container(
               height: 100.0,
               padding: const EdgeInsets.all(5),
@@ -232,8 +232,6 @@ class _EthMonthlyViewState extends State<EthMonthlyView> {
   }
 
   Widget _buildWeekdayHeaders(int startOfWeek) {
-    final calendarTheme = Theme.of(context).extension<CalendarThemeData>()!;
-    final colorScheme = Theme.of(context).colorScheme;
     // Generate weekday names starting from custom start day
     final weekdays = List.generate(7, (index) {
       final weekday =
