@@ -3,384 +3,211 @@ import 'package:eccalendar/screens/date_screen.dart';
 import 'package:eccalendar/state/state_manager.dart';
 import 'package:eccalendar/utils/eth_utils.dart';
 import 'package:eccalendar/utils/themedata_extension.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class MonthlyCalendarView extends StatefulWidget {
-  final EtDatetime month;
+class MonthlyWidget extends StatefulWidget {
+  final EtDatetime date;
 
-  const MonthlyCalendarView({super.key, required this.month});
+  const MonthlyWidget({super.key, required this.date});
 
   @override
-  State<MonthlyCalendarView> createState() => _MonthlyCalendarViewState();
+  State<MonthlyWidget> createState() => _MonthlyWidgetState();
 }
 
-class _MonthlyCalendarViewState extends State<MonthlyCalendarView> {
-  late List<_DayCell> genDays;
-  late CalendarThemeData calendarTheme;
-  late ColorScheme colorScheme;
-
-  late DateChangeNotifier dateChangeNotifier;
-  late CalEventProvider calEventNotifier;
+class _MonthlyWidgetState extends State<MonthlyWidget> {
+  List<EtDatetime>? dayCells;
+  final Map<int, List<EtDatetime>> _monthCache = {};
+  int _currentMonth = DateTime.now().month;
 
   @override
   void initState() {
     super.initState();
-    genDays = _generateMonthDays(widget.month);
+    computeMonthDays();
   }
 
   @override
-  void didUpdateWidget(covariant MonthlyCalendarView oldWidget) {
+  void didUpdateWidget(covariant MonthlyWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.month != widget.month) {
-      genDays = _generateMonthDays(widget.month);
-      dateChangeNotifier.changeDate = widget.month;
+    if (oldWidget.date != widget.date) {
+      computeMonthDays();
     }
-  }
-
-  @override
-  void didChangeDependencies() {
-    calendarTheme = Theme.of(context).extension<CalendarThemeData>()!;
-    colorScheme = Theme.of(context).colorScheme;
-    dateChangeNotifier = Provider.of<DateChangeNotifier>(context, listen: true);
-    calEventNotifier = Provider.of<CalEventProvider>(context, listen: false);
-
-    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
     super.dispose();
     //not advisable to dispose provider objects
-    // selectedNotifier.dispose();
+    // dateChangeNotifier.dispose();
     // calEventNotifier.dispose();
+  }
+
+  Future<void> computeMonthDays() async {
+    final List<EtDatetime> futureCell = await compute(
+      generateMonthDaysNew,
+      widget.date,
+    );
+    setState(() {
+      dayCells = futureCell;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 7,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        mainAxisExtent: 50,
-        childAspectRatio: 5,
-      ),
-      physics: const NeverScrollableScrollPhysics(),
-      // padding: const EdgeInsets.all(4),
-      itemCount: 42,
-      itemBuilder: (context, index) {
-        final cellDate = genDays[index];
-
-        final EtDatetime today = EtDatetime.now();
-
-        final isToday = EthUtils.isSameDay(cellDate.date, today);
-        final isSelected = EthUtils.isSameDay(
-          cellDate.date,
-          dateChangeNotifier.selectedDate,
-        );
-        return GestureDetector(
-          onTap: () {
-            dateChangeNotifier.selectedDate = cellDate.date;
-            calEventNotifier.bealEvent = cellDate.bealEvent;
-            if (isSelected) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (context) => EtDateDetails(selectedDate: cellDate.date),
-                ),
-              );
-            }
-          },
-          child: Container(
-            alignment: Alignment.center,
-            // margin: const EdgeInsets.all(1),
-            padding: const EdgeInsets.all(1),
-            // height: 70,
-            // width: 65,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color:
-                    isSelected
-                        ? calendarTheme.selectedDayColor
-                        : Color(0x00000000),
-              ),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-
-              children: [
-                Container(
-                  alignment: Alignment.center,
-                  // margin: const EdgeInsets.only(top: 2),
-                  decoration: BoxDecoration(
-                    color: isToday ? Colors.cyan : null,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  width: 25,
-                  child: Text(
-                    '${cellDate.date.day}',
-                    style: TextStyle(
-                      color:
-                          cellDate.isCurrentMonth
-                              ? isToday
-                                  ? Colors.white
-                                  : colorScheme.primary
-                              : Colors.grey,
-                      fontWeight:
-                          cellDate.isCurrentMonth
-                              ? FontWeight.w400
-                              : FontWeight.w300,
-                      fontSize: 16.5,
-                    ),
-                  ),
-                ),
-
-                Container(
-                  alignment: Alignment.bottomRight,
-                  margin: const EdgeInsets.only(top: 0),
-                  // width: 6,
-                  // height: 6,
-                  child: Text(
-                    DateTime.fromMillisecondsSinceEpoch(
-                      cellDate.date.moment,
-                    ).day.toString(),
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  ),
-                ),
-                cellDate.hasEvents
-                    ? Container(
-                      alignment: Alignment.bottomLeft,
-                      // margin: const EdgeInsets.only(top: 2),
-                      width: 50,
-                      height: 2,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        color: Colors.blue,
-                      ),
-                    )
-                    : Container(
-                      alignment: Alignment.bottomLeft,
-                      margin: const EdgeInsets.only(top: 2),
-                      width: 50,
-                      height: 2,
-                    ),
-              ],
-            ),
-          ),
-        );
-      },
+    if (dayCells == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+    final CalendarThemeData calendarTheme =
+        Theme.of(context).extension<CalendarThemeData>()!;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    DateChangeNotifier dateChangeNotifier = Provider.of<DateChangeNotifier>(
+      context,
+      listen: true,
     );
+    CalEventProvider calEventNotifier = Provider.of<CalEventProvider>(
+      context,
+      listen: false,
+    );
+
+    return Table(children: _buildCalendarRows());
   }
 
-  // List<TableRow> _buildCalendarRows() {
-  //   // Create list of days to display (including leading/trailing days from other months)
-  //   // final List<_DayCell> genDays = _generateMonthgenDays(widget.month);
-  //   // Build table rows
-  //   final rows = <TableRow>[];
+  List<TableRow> _buildCalendarRows() {
+    // Create list of days to display (including leading/trailing days from other months)
+    // final List<DayCell> dayCells! = _generateMonthdayCells(widget.month);
+    // Build table rows
+    final rows = <TableRow>[];
 
-  //   // Add day cells
-  //   for (var i = 0; i < genDays.length; i += 7) {
-  //     final week = genDays.sublist(i, i + 7);
+    // Add day cells
+    for (var i = 0; i < dayCells!.length; i += 7) {
+      final week = dayCells!.sublist(i, i + 7);
 
-  //     rows.add(
-  //       TableRow(children: week.map((date) => _buildDayCell(date)).toList()),
-  //     );
-  //   }
-
-  //   return rows;
-  // }
-
-  // Widget _buildDayCell(_DayCell cellDate) {
-  //   final EtDatetime today = EtDatetime.now();
-  //   final isToday = EthUtils.isSameDay(cellDate.date, today);
-  //   final isSelected = EthUtils.isSameDay(
-  //     cellDate.date,
-  //     selectedNotifier.selectedDate,
-  //   );
-  //   return GestureDetector(
-  //     onTap: () {
-  //       selectedNotifier.selectedDate = cellDate.date;
-  //       calEventNotifier.bealEvent = cellDate.bealEvent;
-  //       if (isSelected) {
-  //         Navigator.push(
-  //           context,
-  //           MaterialPageRoute(
-  //             builder: (context) => EtDateDetails(selectedDate: cellDate.date),
-  //           ),
-  //         );
-  //       }
-  //     },
-  //     child: Container(
-  //       alignment: Alignment.center,
-  //       margin: const EdgeInsets.all(1),
-  //       padding: const EdgeInsets.all(2),
-  //       height: 55,
-  //       width: 65,
-  //       decoration: BoxDecoration(
-  //         border: Border.all(
-  //           color:
-  //               isSelected ? calendarTheme.selectedDayColor : Color(0x00000000),
-  //         ),
-  //         borderRadius: BorderRadius.circular(6),
-  //       ),
-  //       child: Column(
-  //         mainAxisAlignment: MainAxisAlignment.center,
-
-  //         children: [
-  //           Container(
-  //             alignment: Alignment.center,
-  //             // margin: const EdgeInsets.only(top: 2),
-  //             decoration: BoxDecoration(
-  //               color: isToday ? Colors.cyan : null,
-  //               borderRadius: BorderRadius.circular(6),
-  //             ),
-  //             width: 25,
-  //             child: Text(
-  //               '${cellDate.date.day}',
-  //               style: TextStyle(
-  //                 color:
-  //                     cellDate.isCurrentMonth
-  //                         ? isToday
-  //                             ? Colors.white
-  //                             : colorScheme.primary
-  //                         : Colors.grey,
-  //                 fontWeight:
-  //                     cellDate.isCurrentMonth
-  //                         ? FontWeight.w400
-  //                         : FontWeight.w300,
-  //                 fontSize: 16.5,
-  //               ),
-  //             ),
-  //           ),
-
-  //           Container(
-  //             alignment: Alignment.bottomRight,
-  //             margin: const EdgeInsets.only(top: 0),
-  //             // width: 6,
-  //             // height: 6,
-  //             child: Text(
-  //               DateTime.fromMillisecondsSinceEpoch(
-  //                 cellDate.date.moment,
-  //               ).day.toString(),
-  //               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-  //             ),
-  //           ),
-  //           cellDate.hasEvents
-  //               ? Container(
-  //                 alignment: Alignment.bottomLeft,
-  //                 // margin: const EdgeInsets.only(top: 2),
-  //                 width: 50,
-  //                 height: 2,
-  //                 decoration: BoxDecoration(
-  //                   shape: BoxShape.rectangle,
-  //                   color: Colors.blue,
-  //                 ),
-  //               )
-  //               : Container(
-  //                 alignment: Alignment.bottomLeft,
-  //                 margin: const EdgeInsets.only(top: 2),
-  //                 width: 50,
-  //                 height: 2,
-  //               ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  List<_DayCell> _generateMonthDays(EtDatetime month) {
-    /**
-     *
-     * weekdays
-     * sun->0
-     * mon->1
-     * tue->2
-     * wed->3
-     * thu->4
-     * fri->5
-     * sat->6
-     * */
-    final startWeekDay = month.weekday % 7;
-
-    final totalDays = month.totalDays();
-
-    //prev month
-    final EtDatetime prevMonth;
-    if (month.month - 1 == 0) {
-      prevMonth = EtDatetime(year: month.year - 1, month: 13);
-    } else {
-      prevMonth = EtDatetime(year: month.year, month: month.month - 1);
+      rows.add(
+        TableRow(children: week.map((date) => _buildDayCell(date)).toList()),
+      );
     }
-    final prevMonthDays = prevMonth.totalDays();
-    final leadingDays = [
-      for (int i = startWeekDay - 1; i >= 0; i--)
-        _DayCell(
-          date: EtDatetime(
-            year: prevMonth.year,
-            month: prevMonth.month,
-            day: prevMonthDays - i,
-          ),
-          isCurrentMonth: false,
-        ),
-    ];
 
-    //current month
-    final currentDays = [
-      for (int d = 1; d <= totalDays; d++)
-        _DayCell(
-          date: EtDatetime(year: month.year, month: month.month, day: d),
-          isCurrentMonth: true,
-        ),
-    ];
+    return rows;
+  }
 
-    // Next month
-    final trailingNeeded =
-        EthUtils.dayGrid - (leadingDays.length + currentDays.length);
-    final nextMonth = EtDatetime(year: month.year, month: month.month + 1);
-    final trailingDays = [
-      for (int d = 1; d <= trailingNeeded; d++)
-        _DayCell(
-          date: EtDatetime(
-            year: nextMonth.year,
-            month: nextMonth.month,
-            day: d,
+  Widget _buildDayCell(EtDatetime cellDate) {
+    final CalendarThemeData calendarTheme =
+        Theme.of(context).extension<CalendarThemeData>()!;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    DateChangeNotifier dateChangeNotifier = Provider.of<DateChangeNotifier>(
+      context,
+      listen: true,
+    );
+    CalEventProvider calEventNotifier = Provider.of<CalEventProvider>(
+      context,
+      listen: false,
+    );
+
+    final EtDatetime today = EtDatetime.now();
+    final isToday = isSameDay(cellDate, today);
+    final isSelected = isSameDay(cellDate, dateChangeNotifier.selectedDate);
+    final isCurrentMonth = currentMonth(cellDate, widget.date);
+    return GestureDetector(
+      onTap: () {
+        dateChangeNotifier.selectedDate = cellDate;
+        calEventNotifier.bealEvent = cellDate.bealEvent;
+        if (isSelected) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EtDateDetails(selectedDate: cellDate),
+            ),
+          );
+        }
+      },
+      child: Container(
+        alignment: Alignment.center,
+        margin: const EdgeInsets.all(1),
+        padding: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color:
+                isSelected ? calendarTheme.selectedDayColor : Color(0x00000000),
           ),
-          isCurrentMonth: false,
+          borderRadius: BorderRadius.circular(6),
         ),
-    ];
-    return [...leadingDays, ...currentDays, ...trailingDays];
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+
+          children: [
+            Container(
+              alignment: Alignment.center,
+              // margin: const EdgeInsets.only(top: 2),
+              decoration: BoxDecoration(
+                color: isToday ? Colors.cyan : null,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                '${cellDate.day}',
+                style: TextStyle(
+                  color:
+                      isCurrentMonth
+                          ? isToday
+                              ? Colors.white
+                              : colorScheme.primary
+                          : Colors.grey,
+                  fontWeight:
+                      isCurrentMonth ? FontWeight.w500 : FontWeight.w300,
+                  fontSize: isCurrentMonth ? 18 : 17,
+                ),
+              ),
+            ),
+            Text(
+              DateTime.fromMillisecondsSinceEpoch(
+                cellDate.moment,
+              ).day.toString(),
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              textAlign: TextAlign.end,
+            ),
+            cellDate.hasEvents
+                ? Container(
+                  alignment: Alignment.bottomLeft,
+                  // margin: const EdgeInsets.only(top: 2),
+                  width: 50,
+                  height: 2,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    color: Colors.blue,
+                  ),
+                )
+                : Container(
+                  alignment: Alignment.bottomLeft,
+                  margin: const EdgeInsets.only(top: 2),
+                  width: 50,
+                  height: 2,
+                ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
-// List loadEvents(List<_DayCell> dayCells) {
-//   return dayCells.map((element) {
-//     return EthUtils.dayEvent(element.date);
+// List loadEvents(List<DayCell> dayCells!) {
+//   return dayCells!.map((element) {
+//     return dayEvent(element.date);
 //   }).toList();
 // }
 
-class _DayCell {
-  final EtDatetime date;
-  final bool isCurrentMonth;
-  _DayCell({required this.date, required this.isCurrentMonth});
+extension on EtDatetime {
+  List get dayEvent {
+    return BahireHasab(year: year).allAtswamat.where((element) {
+      return element['day']['date'] == day &&
+          element['day']['month'] == monthGeez;
+    }).toList();
+  }
+
   bool get hasEvents {
-    return EthUtils.dayEvent(date).isNotEmpty;
+    return dayEvent.isNotEmpty;
   }
 
   BealEvent get bealEvent {
-    return BealEvent.fromJson(EthUtils.dayEvent(date).toList());
-  }
-}
-
-extension on EtDatetime {
-  int totalDays() {
-    return month == 13
-        ? isLeap
-            ? 6
-            : 5
-        : 30;
+    return BealEvent.fromJson(dayEvent);
   }
 }

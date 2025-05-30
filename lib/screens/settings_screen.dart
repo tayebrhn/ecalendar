@@ -1,0 +1,84 @@
+import 'package:flutter/material.dart';
+
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  _SettingsScreenState createState() => _SettingsScreenState();
+}
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _notificationsEnabled = true;
+  bool _darkModeEnabled = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Settings',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 20),
+          Card(
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: Text('Enable Notifications'),
+                  subtitle: Text('Receive push notifications'),
+                  value: _notificationsEnabled,
+                  onChanged: (value) {
+                    setState(() {
+                      _notificationsEnabled = value;
+                    });
+                  },
+                ),
+                Divider(height: 1),
+                SwitchListTile(
+                  title: Text('Dark Mode'),
+                  subtitle: Text('Enable dark theme'),
+                  value: _darkModeEnabled,
+                  onChanged: (value) {
+                    setState(() {
+                      _darkModeEnabled = value;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 20),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Icon(Icons.language),
+                  title: Text('Language'),
+                  subtitle: Text('English'),
+                  trailing: Icon(Icons.arrow_forward_ios),
+                  onTap: () {},
+                ),
+                Divider(height: 1),
+                ListTile(
+                  leading: Icon(Icons.security),
+                  title: Text('Privacy & Security'),
+                  trailing: Icon(Icons.arrow_forward_ios),
+                  onTap: () {},
+                ),
+                Divider(height: 1),
+                ListTile(
+                  leading: Icon(Icons.help),
+                  title: Text('Help & Support'),
+                  trailing: Icon(Icons.arrow_forward_ios),
+                  onTap: () {},
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

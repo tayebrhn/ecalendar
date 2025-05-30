@@ -7,6 +7,7 @@ enum PageType { year, month, convert, settings }
 class DateChangeNotifier with ChangeNotifier {
   EtDatetime _selected = EtDatetime.now();
   EtDatetime _changeDate = EtDatetime.now();
+
   // int _currentPageIndex = EthUtils.initialPage;
   
 
@@ -67,7 +68,10 @@ class DateChangeNotifier with ChangeNotifier {
     _changeDate = date;
     notifyListeners();
   }
-
+void changeDateUpdate() {
+    _changeDate = today;
+    notifyListeners();
+  }
   // EtDatetime getSetDate(int index) {
   //   _changeDate = EtDatetime(
   //     year: today.year + (index - _currentPageIndex) ~/ 13,
@@ -94,6 +98,8 @@ class DateChangeNotifier with ChangeNotifier {
     _selected = date;
     notifyListeners();
   }
+
+  
 }
 
 class PageProvider with ChangeNotifier {
