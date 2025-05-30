@@ -109,11 +109,12 @@ class _VerticalDatePickerState extends State<VerticalDatePicker> {
   }
 
   int _getDaysInMonth(int year, int month) {
-    return EtDatetime(year: year, month: month + 1, day: 0).day;
+            print("DAYSINMONTHmonth${month}}");
+
+    return EtDatetime(year: year, month: month).totalDays;
   }
 
   void _onDateChanged() {
-    try {
       final newDate = EtDatetime(
         year: _years[_yearController.selectedItem],
         month: _months[_monthController.selectedItem],
@@ -129,12 +130,12 @@ class _VerticalDatePickerState extends State<VerticalDatePicker> {
       }
 
       setState(() {
+
         _selectedDate = newDate;
         _updateDays();
       });
 
       widget.onDateChange(_selectedDate);
-    } catch (e) {}
   }
 
   @override
@@ -194,7 +195,7 @@ class _VerticalDatePickerState extends State<VerticalDatePicker> {
                   if (index < 0 || index >= _months.length) {
                     return null;
                   }
-                  return _buildDateItem(DateFormat('MMM').format(DateTime(2022, index + 1)));
+                  return _buildDateItem(ETC(year: 2000,month: index+1).monthName!);
                 },
                 childCount: _months.length,
               ),
@@ -249,5 +250,30 @@ class _VerticalDatePickerState extends State<VerticalDatePicker> {
         ),
       ),
     );
+  }
+}
+
+extension on EtDatetime {
+  // List dayEvent() {
+  //   return BahireHasab(year: year).allAtswamat.where((element) {
+  //     return element['day']['date'] == day &&
+  //         element['day']['month'] == monthGeez;
+  //   }).toList();
+  // }
+
+  // bool get hasEvents {
+  //   return dayEvent().isNotEmpty;
+  // }
+
+  // BealEvent get bealEvent {
+  //   return BealEvent.fromJson(dayEvent());
+  // }
+
+  int get totalDays {
+    return month == 13
+        ? isLeap
+            ? 6
+            : 5
+        : 30;
   }
 }
