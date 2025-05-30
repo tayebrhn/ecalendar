@@ -111,7 +111,7 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
     return GestureDetector(
       onTap: () {
         dateChangeNotifier.selectedDate = cellDate;
-        calEventNotifier.bealEvent = cellDate.bealEvent;
+        calEventNotifier.bealEvent = bealEvent(cellDate);
         if (isSelected) {
           Navigator.push(
             context,
@@ -165,7 +165,7 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               textAlign: TextAlign.end,
             ),
-            cellDate.hasEvents
+            hasEvents(cellDate)
                 ? Container(
                   alignment: Alignment.bottomLeft,
                   // margin: const EdgeInsets.only(top: 2),
@@ -186,28 +186,5 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
         ),
       ),
     );
-  }
-}
-
-// List loadEvents(List<DayCell> dayCells!) {
-//   return dayCells!.map((element) {
-//     return dayEvent(element.date);
-//   }).toList();
-// }
-
-extension on EtDatetime {
-  List get dayEvent {
-    return BahireHasab(year: year).allAtswamat.where((element) {
-      return element['day']['date'] == day &&
-          element['day']['month'] == monthGeez;
-    }).toList();
-  }
-
-  bool get hasEvents {
-    return dayEvent.isNotEmpty;
-  }
-
-  BealEvent get bealEvent {
-    return BealEvent.fromJson(dayEvent);
   }
 }

@@ -54,6 +54,33 @@ class BealEvent {
   int get date => _date;
 }
 
+extension on EtDatetime {
+  List get dayEvent {
+    return BahireHasab(year: year).allAtswamat.where((element) {
+      return element['day']['date'] == day &&
+          element['day']['month'] == monthGeez;
+    }).toList();
+  }
+
+  bool get hasEvents {
+    return dayEvent.isNotEmpty;
+  }
+
+  BealEvent get bealEvent {
+    return BealEvent.fromJson(dayEvent);
+  }
+}
+
+
+
+bool hasEvents(EtDatetime date){
+  return date.hasEvents;
+}
+
+BealEvent bealEvent(EtDatetime event){
+  return event.bealEvent;
+}
+
 // class DayCell {
 //   final EtDatetime date;
 //   final bool isCurrentMonth;
@@ -90,6 +117,10 @@ extension on EtDatetime {
             : 5
         : 30;
   }
+}
+
+int totalDays(EtDatetime date){
+return date.totalDays;
 }
 
 // List<DayCell> generateMonthDays(EtDatetime month) {
