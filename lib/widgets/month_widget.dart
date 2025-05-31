@@ -132,6 +132,7 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
         }
       },
       child: Container(
+        height: 85,
         alignment: Alignment.center,
         margin: const EdgeInsets.all(1),
         padding: const EdgeInsets.all(2),
@@ -151,7 +152,7 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
               // margin: const EdgeInsets.only(top: 2),
               decoration: BoxDecoration(
                 color: isToday ? Colors.cyan : null,
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(5),
               ),
               child: Text(
                 '${cellDate.day}',
@@ -160,7 +161,7 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
                       isCurrentMonth
                           ? isToday
                               ? Colors.white
-                              : colorScheme.primary
+                              : Colors.lightBlueAccent
                           : Colors.grey,
                   fontWeight:
                       isCurrentMonth ? FontWeight.w500 : FontWeight.w300,

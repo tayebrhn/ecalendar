@@ -70,8 +70,6 @@ class _VerticalDatePickerState extends State<VerticalDatePicker> {
   }
 
   int _getDaysInMonth(int year, int month) {
-    print("DAYSINMONTHmonth${month}}");
-
     return totalDays(EtDatetime(year: year, month: month));
   }
 

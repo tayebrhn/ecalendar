@@ -50,23 +50,27 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
       context,
       listen: false,
     );
-    return Padding(
-      padding: const EdgeInsets.all(5),
+    return Card(
+                    color: Colors.grey[200],
+
       child: Column(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Expanded(flex: 1, child: _buildWeekdayHeaders(2)),
           Expanded(
-            flex: 8,
+            flex: 1,
+            child: _buildWeekdayHeaders(2),
+          ),
+          Expanded(
+            flex: 11,
             child: PageView.builder(
               controller: _pageController,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
                 // dateChangeProvider.changeDate =
                 final EtDatetime date = monthOffset(index);
-
+                  
                 // WidgetsBinding.instance.addPostFrameCallback((_) {
                 //   context.read<DateChangeNotifier>().changeDate = date;
                 // });
@@ -84,36 +88,14 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
                   },
                 );
               },
-              //precedence in calculation matters, 
-              //if onPageChanged was called before itemBuilder it always called first, 
+              //precedence in calculation matters,
+              //if onPageChanged was called before itemBuilder it always called first,
               //therefore not synching the correct index of the itemBuilder
               onPageChanged: (index) {
                 context.read<DateChangeNotifier>().changeDate = monthOffset(
                   index,
                 );
               },
-            ),
-          ),
-
-          Expanded(
-            flex: 5,
-            child: Container(
-              height: 100.0,
-              padding: const EdgeInsets.all(5),
-              // margin: const EdgeInsets.all(5),
-              alignment: Alignment.topLeft,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.white10),
-              ),
-              child: Consumer<CalEventProvider>(
-                builder: (context, value, child) {
-                  return Text(
-                    value.bealEvent.beal,
-                    style: TextStyle(fontSize: 18),
-                    textAlign: TextAlign.left,
-                  );
-                },
-              ),
             ),
           ),
         ],
@@ -125,13 +107,13 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
     // Generate weekday names starting from custom start day
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    final weekdays = List.generate(7, (index) {
-      final weekday =
-          (startOfWeek - 1 + index) % 7 + 1; // Calculate weekday number
-      return DateFormat(
-        'E',
-      ).format(DateTime(2023, 1, weekday)); // Any date with known weekday
-    });
+    // final weekdays = List.generate(7, (index) {
+    //   final weekday =
+    //       (startOfWeek - 1 + index) % 7 + 1; // Calculate weekday number
+    //   return DateFormat(
+    //     'E',
+    //   ).format(DateTime(2023, 1, weekday)); // Any date with known weekday
+    // });
 
     return Table(
       children: [
@@ -141,12 +123,14 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
                   .map(
                     (day) => Container(
                       alignment: Alignment.center,
+                      padding: const EdgeInsets.only(top: 10),
                       child: Text(
-                        day,
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
                         ),
+                        overflow: TextOverflow.clip,
+                        day.toString(),
                       ),
                     ),
                   )
@@ -154,6 +138,5 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
         ),
       ],
     );
-    ;
   }
 }

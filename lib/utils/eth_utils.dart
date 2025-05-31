@@ -2,6 +2,7 @@ import 'package:abushakir/abushakir.dart';
 
 const initialPage = 10000;
 const int dayGrid = 42;
+final weekdays = ['ሰኞ', 'ማክሰኞ', 'ረቡዕ', 'ሐሙስ', 'አርብ', 'ቅዳሜ', 'እሑድ'];
 
 EtDatetime getfirstDayOfWeek(EtDatetime date) {
   return date.subtract(Duration(days: date.weekday - 1));
@@ -66,7 +67,7 @@ class BealEvent {
 // }
 
 extension on EtDatetime {
-  List dayEvent() {
+  List get dayEvent {
     return BahireHasab(year: year).allAtswamat.where((element) {
       return element['day']['date'] == day &&
           element['day']['month'] == monthGeez;
@@ -74,11 +75,20 @@ extension on EtDatetime {
   }
 
   bool get hasEvents {
-    return dayEvent().isNotEmpty;
+    final b = BahireHasab(year: year).allAtswamat;
+    for (var element in b) {
+      if (element['day']['month'] == monthGeez) {
+        return true;
+      }
+    }
+    return false;
   }
+  // bool get hasEvents {
+  //   return dayEvent.isNotEmpty;
+  // }
 
   BealEvent get bealEvent {
-    return BealEvent.fromJson(dayEvent());
+    return BealEvent.fromJson(dayEvent);
   }
 
   int get totalDays {
