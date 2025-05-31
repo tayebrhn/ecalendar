@@ -9,8 +9,13 @@ import 'package:provider/provider.dart';
 
 class MonthlyWidget extends StatefulWidget {
   final EtDatetime date;
+  final void Function(EtDatetime date) onDateChanged;
 
-  const MonthlyWidget({super.key, required this.date});
+  const MonthlyWidget({
+    super.key,
+    required this.date,
+    required this.onDateChanged,
+  });
 
   @override
   State<MonthlyWidget> createState() => _MonthlyWidgetState();
@@ -26,13 +31,16 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
     super.initState();
     computeMonthDays();
   }
-
-  @override
+@override
   void didUpdateWidget(covariant MonthlyWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.date != widget.date) {
       computeMonthDays();
     }
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
@@ -55,6 +63,9 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   widget.onDateChanged(widget.date);
+    // });
     if (dayCells == null) {
       return Center(child: CircularProgressIndicator());
     }
@@ -69,7 +80,6 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
       context,
       listen: false,
     );
-
     return Table(children: _buildCalendarRows());
   }
 

@@ -1,9 +1,7 @@
 import 'package:abushakir/abushakir.dart';
-import 'package:flutter/material.dart';
 
 const initialPage = 10000;
 const int dayGrid = 42;
-
 
 EtDatetime getfirstDayOfWeek(EtDatetime date) {
   return date.subtract(Duration(days: date.weekday - 1));
@@ -54,33 +52,6 @@ class BealEvent {
   int get date => _date;
 }
 
-extension on EtDatetime {
-  List get dayEvent {
-    return BahireHasab(year: year).allAtswamat.where((element) {
-      return element['day']['date'] == day &&
-          element['day']['month'] == monthGeez;
-    }).toList();
-  }
-
-  bool get hasEvents {
-    return dayEvent.isNotEmpty;
-  }
-
-  BealEvent get bealEvent {
-    return BealEvent.fromJson(dayEvent);
-  }
-}
-
-
-
-bool hasEvents(EtDatetime date){
-  return date.hasEvents;
-}
-
-BealEvent bealEvent(EtDatetime event){
-  return event.bealEvent;
-}
-
 // class DayCell {
 //   final EtDatetime date;
 //   final bool isCurrentMonth;
@@ -95,20 +66,20 @@ BealEvent bealEvent(EtDatetime event){
 // }
 
 extension on EtDatetime {
-  // List dayEvent() {
-  //   return BahireHasab(year: year).allAtswamat.where((element) {
-  //     return element['day']['date'] == day &&
-  //         element['day']['month'] == monthGeez;
-  //   }).toList();
-  // }
+  List dayEvent() {
+    return BahireHasab(year: year).allAtswamat.where((element) {
+      return element['day']['date'] == day &&
+          element['day']['month'] == monthGeez;
+    }).toList();
+  }
 
-  // bool get hasEvents {
-  //   return dayEvent().isNotEmpty;
-  // }
+  bool get hasEvents {
+    return dayEvent().isNotEmpty;
+  }
 
-  // BealEvent get bealEvent {
-  //   return BealEvent.fromJson(dayEvent());
-  // }
+  BealEvent get bealEvent {
+    return BealEvent.fromJson(dayEvent());
+  }
 
   int get totalDays {
     return month == 13
@@ -119,8 +90,24 @@ extension on EtDatetime {
   }
 }
 
-int totalDays(EtDatetime date){
-return date.totalDays;
+EtDatetime monthOffset(int index) {
+  return EtDatetime(
+    year: EtDatetime.now().year + (index - initialPage) ~/ 13,
+    month: EtDatetime.now().month + (index - initialPage) % 13,
+    day: 1,
+  );
+}
+
+bool hasEvents(EtDatetime date) {
+  return date.hasEvents;
+}
+
+BealEvent bealEvent(EtDatetime event) {
+  return event.bealEvent;
+}
+
+int totalDays(EtDatetime date) {
+  return date.totalDays;
 }
 
 // List<DayCell> generateMonthDays(EtDatetime month) {

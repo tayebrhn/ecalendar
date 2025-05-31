@@ -39,7 +39,6 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     List<EtDatetime> daycell;
     // final pageManager =
     // //     Provider.of<DateChangeNotifier>(context, listen: false).pageController;
@@ -66,17 +65,11 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
                 // dateChangeProvider.changeDate =
-                final EtDatetime date = EtDatetime(
-                  year: EtDatetime.now().year + (index - initialPage) ~/ 13,
-                  month: EtDatetime.now().month + (index - initialPage) % 13,
-                  day: 1,
-                );
+                final EtDatetime date = monthOffset(index);
 
-
-
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  context.read<DateChangeNotifier>().changeDate=date;
-                });
+                // WidgetsBinding.instance.addPostFrameCallback((_) {
+                //   context.read<DateChangeNotifier>().changeDate = date;
+                // });
                 return MonthlyWidget(
                   date: date,
                   // onDateSelected: (EtDatetime date) {
@@ -86,6 +79,17 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
                   // },
                   // prevMonthCallback: _goToPreviousMonth,
                   // nextMonthCallback: _goToNextMonth,
+                  onDateChanged: (date) {
+                    // context.read<DateChangeNotifier>().changeDate = date;
+                  },
+                );
+              },
+              //precedence in calculation matters, 
+              //if onPageChanged was called before itemBuilder it always called first, 
+              //therefore not synching the correct index of the itemBuilder
+              onPageChanged: (index) {
+                context.read<DateChangeNotifier>().changeDate = monthOffset(
+                  index,
                 );
               },
             ),
@@ -116,7 +120,6 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
       ),
     );
   }
-
 
   Widget _buildWeekdayHeaders(int startOfWeek) {
     // Generate weekday names starting from custom start day
@@ -154,4 +157,3 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
     ;
   }
 }
-
