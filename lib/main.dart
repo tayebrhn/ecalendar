@@ -4,6 +4,7 @@ import 'package:eccalendar/screens/convert_screen.dart';
 import 'package:eccalendar/screens/month_screen.dart';
 import 'package:eccalendar/screens/settings_screen.dart';
 import 'package:eccalendar/state/state_manager.dart';
+import 'package:eccalendar/utils/eth_utils.dart';
 import 'package:eccalendar/utils/themedata_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +21,9 @@ void main() {
         ),
         ChangeNotifierProvider<CalEventProvider>(
           create: (context) => CalEventProvider(),
+        ),
+        ChangeNotifierProvider<ThemeProvider>(
+          create: (context) => ThemeProvider(),
         ),
       ],
       child: MyApp(),
@@ -46,7 +50,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
 
-      themeMode: ThemeMode.system,
+      themeMode: context.read<ThemeProvider>().brightness,
       home: MainScreen(),
     );
   }
@@ -171,7 +175,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'today',
+                    getDayName(context.read<DateChangeNotifier>().today),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -179,7 +183,7 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   ),
                   Text(
-                    'year month',
+                    '${context.read<DateChangeNotifier>().today.monthGeez!} ${context.read<DateChangeNotifier>().today}',
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                 ],
@@ -235,123 +239,6 @@ class _MainScreenState extends State<MainScreen> {
         onTap: () => _onItemTapped(index),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
-    );
-  }
-}
-
-class MainLayout extends StatefulWidget {
-  const MainLayout({super.key});
-
-  @override
-  _MainLayoutState createState() => _MainLayoutState();
-}
-
-class _MainLayoutState extends State<MainLayout> {
-  final double sidebarWidth = 250;
-  final Duration duration = Duration(milliseconds: 300);
-  late final PageProvider pageProvider;
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    pageProvider = Provider.of<PageProvider>(context);
-    super.didChangeDependencies();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    // pageProvider.dispose();
-  }
-
-  Widget buildMenuItem(BuildContext context, String title, PageType page) {
-    bool isActive = pageProvider.currentPage == page;
-    return ListTile(
-      title: Text(
-        title,
-        style: TextStyle(
-          color: isActive ? Colors.white : Colors.white70,
-          fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-        ),
-      ),
-      tileColor: isActive ? Colors.black26 : Colors.transparent,
-      onTap: () => pageProvider.switchPage(page),
-    );
-  }
-
-  Widget getPageContent(PageType type) {
-    switch (type) {
-      case PageType.year:
-        return Center(child: Text("Year Page", style: TextStyle(fontSize: 24)));
-      case PageType.month:
-        return MonthlyScreen();
-      case PageType.convert:
-        return Center(
-          child: Text("Convert Page", style: TextStyle(fontSize: 24)),
-        );
-      case PageType.settings:
-        return Center(
-          child: Text("Settings Page", style: TextStyle(fontSize: 24)),
-        );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // _currentDate =
-    // Provider.of<DateChangeNotifier>(context, listen: false).changeDate;
-    return Consumer<PageProvider>(
-      builder: (context, provider, _) {
-        return Scaffold(
-          body: Stack(
-            children: [
-              // Sidebar
-              AnimatedPositioned(
-                duration: duration,
-                left: provider.isSidebarOpen ? 0 : -sidebarWidth,
-                top: 0,
-                bottom: 0,
-                child: Container(
-                  width: sidebarWidth,
-                  color: Colors.blueGrey[800],
-                  child: Column(
-                    children: [
-                      SizedBox(height: 100),
-                      buildMenuItem(context, "Month", PageType.month),
-                      buildMenuItem(context, "Convert", PageType.convert),
-                      buildMenuItem(context, "Settings", PageType.settings),
-                      Spacer(),
-                      ListTile(
-                        leading: Icon(Icons.close, color: Colors.white),
-                        title: Text(
-                          "Close",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onTap: () => provider.closeSideBar(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Main content
-              AnimatedPositioned(
-                duration: duration,
-                left: provider.isSidebarOpen ? sidebarWidth : 0,
-                right: provider.isSidebarOpen ? -sidebarWidth : 0,
-                top: 0,
-                bottom: 0,
-                child: AnimatedSwitcher(
-                  duration: Duration(milliseconds: 300),
-                  child: getPageContent(provider.currentPage),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

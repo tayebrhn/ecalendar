@@ -63,6 +63,7 @@ class _VerticalDatePickerState extends State<VerticalDatePicker> {
   }
 
   void _updateDays() {
+    print(_selectedDate.month);
     _days = List<int>.generate(
       _getDaysInMonth(_selectedDate.year, _selectedDate.month),
       (index) => index + 1,

@@ -1,4 +1,6 @@
+import 'package:eccalendar/state/state_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -6,9 +8,16 @@ class SettingsScreen extends StatefulWidget {
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
 }
+
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
   bool _darkModeEnabled = false;
+  void _hadleSwitch(bool value) {
+    // Provider.of<ThemeProvider>(context, listen: false).switchTheme(value);
+    context.read()<ThemeProvider>().switchTheme(value);
+    _darkModeEnabled = true;
+    _darkModeEnabled = _darkModeEnabled ? false : true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,33 +26,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Settings',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 20),
           Card(
             child: Column(
               children: [
-                SwitchListTile(
-                  title: Text('Enable Notifications'),
-                  subtitle: Text('Receive push notifications'),
-                  value: _notificationsEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _notificationsEnabled = value;
-                    });
-                  },
-                ),
-                Divider(height: 1),
+                // SwitchListTile(
+                //   title: Text('Enable Notifications'),
+                //   subtitle: Text('Receive push notifications'),
+                //   value: _notificationsEnabled,
+                //   onChanged: (value) {
+                //     setState(() {
+                //       _notificationsEnabled = value;
+                //     });
+                //   },
+                // ),
+                // Divider(height: 1),
                 SwitchListTile(
                   title: Text('Dark Mode'),
                   subtitle: Text('Enable dark theme'),
                   value: _darkModeEnabled,
                   onChanged: (value) {
-                    setState(() {
-                      _darkModeEnabled = value;
-                    });
+                      _hadleSwitch(value);
                   },
                 ),
               ],

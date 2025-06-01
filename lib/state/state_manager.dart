@@ -9,7 +9,6 @@ class DateChangeNotifier with ChangeNotifier {
   EtDatetime _changeDate = EtDatetime.now();
 
   // int _currentPageIndex = EthUtils.initialPage;
-  
 
   // PageController get pageController => _pageController;
   // int get currentPageIndex => _currentPageIndex;
@@ -68,7 +67,8 @@ class DateChangeNotifier with ChangeNotifier {
     _changeDate = date;
     notifyListeners();
   }
-void changeDateUpdate() {
+
+  void changeDateUpdate() {
     _changeDate = today;
     notifyListeners();
   }
@@ -98,8 +98,6 @@ void changeDateUpdate() {
     _selected = date;
     notifyListeners();
   }
-
-  
 }
 
 class PageProvider with ChangeNotifier {
@@ -133,12 +131,33 @@ class PageProvider with ChangeNotifier {
 }
 
 class CalEventProvider with ChangeNotifier {
-  BealEvent _bealEvent=BealEvent.empty();
+  BealEvent _bealEvent = BealEvent.empty();
 
   BealEvent get bealEvent => _bealEvent;
 
   set bealEvent(BealEvent event) {
     _bealEvent = event;
+    notifyListeners();
+  }
+}
+
+class ThemeProvider with ChangeNotifier {
+  ThemeMode _brightness = ThemeMode.system;
+  set brightness(ThemeMode b) {
+    _brightness = b;
+    notifyListeners();
+  }
+
+  ThemeMode get brightness {
+    return _brightness;
+  }
+
+  void switchTheme(bool dark) {
+    if (dark) {
+      _brightness = ThemeMode.dark;
+      notifyListeners();
+    }
+    _brightness = ThemeMode.light;
     notifyListeners();
   }
 }

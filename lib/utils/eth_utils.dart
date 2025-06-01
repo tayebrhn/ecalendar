@@ -3,6 +3,28 @@ import 'package:abushakir/abushakir.dart';
 const initialPage = 10000;
 const int dayGrid = 42;
 final weekdays = ['ሰኞ', 'ማክሰኞ', 'ረቡዕ', 'ሐሙስ', 'አርብ', 'ቅዳሜ', 'እሑድ'];
+final months = [
+  'መስከረም',
+  'ጥቅምት',
+  'ኅዳር',
+  'ታኅሣሥ',
+  'ጥር',
+  'የካቲት',
+  'መጋቢት',
+  'ሚያዝያ',
+  'ግንቦት',
+  'ሰኔ',
+  'ሐምሌ',
+  'ነሐሴ',
+  'ጳጉሜ',
+];
+
+String getDayName(EtDatetime index) {
+  if (index.day == index.weekday) {
+    return weekdays[index.weekday];
+  }
+  return weekdays[((index.day - 1) + index.weekday) % 7];
+}
 
 EtDatetime getfirstDayOfWeek(EtDatetime date) {
   return date.subtract(Duration(days: date.weekday - 1));
@@ -77,7 +99,8 @@ extension on EtDatetime {
   bool get hasEvents {
     final b = BahireHasab(year: year).allAtswamat;
     for (var element in b) {
-      if (element['day']['month'] == monthGeez) {
+      if (element['day']['month'] == monthGeez &&
+          element['day']['date'] == day) {
         return true;
       }
     }
