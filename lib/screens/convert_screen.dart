@@ -13,56 +13,52 @@ class ConvertScreen extends StatefulWidget {
 }
 
 class _ConvertScreenState extends State<ConvertScreen> {
-    EtDatetime _selectedDate = EtDatetime.now();
+  EtDatetime _selectedDate = EtDatetime.now();
 
   @override
   Widget build(BuildContext context) {
     return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Text(
-          //   'Selected Date: ${DateFormat('MMMM d, yyyy').format(_selectedDate)}',
-          //   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          // ),
-          SizedBox(height: 20),
-          Card(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Text(
-                    'App Version: 1.0.0',
-                    style: TextStyle(fontSize: 16),
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Text(
+        //   'Selected Date: ${DateFormat('MMMM d, yyyy').format(_selectedDate)}',
+        //   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        // ),
+        SizedBox(height: 20),
+        Card(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Text(
+                  'To Gregorian Calendar:',
+                  style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  DateFormat.yMEd().add_MMM().format(
+                    DateTime.fromMillisecondsSinceEpoch(_selectedDate.moment),
                   ),
-                  SizedBox(height: 10),
-                  Text(
-"Todo",                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    '© 2024 Flutter Calendar Demo App',
-                    style: TextStyle(color: Colors.grey[500], fontSize: 12),
-                  ),
-                ],
-              ),
+                  style: TextStyle(fontSize: 16),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: VerticalDatePicker(
-              onDateChange: (date) {
-                setState(() {
-                  _selectedDate = date;
-                });
-              },
-              initialDate: _selectedDate,
-              firstDate: EtDatetime(year:1780),
-              lastDate: EtDatetime(year:2200),
-            ),
+        ),
+        const SizedBox(height: 20),
+        Expanded(
+          child: VerticalDatePicker(
+            onDateChange: (date) {
+              setState(() {
+                _selectedDate = date;
+              });
+            },
+            initialDate: _selectedDate,
+            firstDate: EtDatetime(year: 1780),
+            lastDate: EtDatetime(year: 2200),
           ),
-        ],
-      );
+        ),
+      ],
+    );
   }
 }
-
