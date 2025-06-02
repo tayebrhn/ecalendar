@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
 
-      themeMode: Provider.of<ThemeProvider>(context,listen: false).currentTheme,
+      themeMode: Provider.of<ThemeProvider>(context,listen: true).currentTheme,
       home: MainScreen(),
     );
   }

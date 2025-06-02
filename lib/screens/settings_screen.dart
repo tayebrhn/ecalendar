@@ -10,14 +10,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _darkModeEnabled = false;
-  void _hadleSwitch(bool value) {
-    // Provider.of<ThemeProvider>(context, listen: false).switchTheme(value);
-    context.read()<ThemeProvider>().switchTheme(value);
-    _darkModeEnabled = true;
-    _darkModeEnabled = _darkModeEnabled ? false : true;
-  }
-
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
