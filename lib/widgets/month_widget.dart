@@ -1,8 +1,8 @@
 import 'package:abushakir/abushakir.dart';
-import 'package:eccalendar/screens/date_screen.dart';
-import 'package:eccalendar/state/state_manager.dart';
-import 'package:eccalendar/utils/eth_utils.dart';
-import 'package:eccalendar/utils/themedata_extension.dart';
+import '../screens/date_screen.dart';
+import '../state/state_manager.dart';
+import '../utils/eth_utils.dart';
+import '../utils/themedata_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

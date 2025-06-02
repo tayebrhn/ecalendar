@@ -1,5 +1,5 @@
 import 'package:abushakir/abushakir.dart';
-import 'package:eccalendar/widgets/vertical_date_picker.dart';
+import '../widgets/vertical_date_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 

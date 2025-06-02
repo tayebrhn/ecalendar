@@ -1,4 +1,4 @@
-package com.example.eccalendar
+package com.taye.ecalendar
 
 import io.flutter.embedding.android.FlutterActivity
 

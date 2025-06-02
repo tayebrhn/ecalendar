@@ -1,5 +1,5 @@
 import 'package:abushakir/abushakir.dart';
-import 'package:eccalendar/utils/eth_utils.dart';
+import '../utils/eth_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

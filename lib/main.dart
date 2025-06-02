@@ -1,11 +1,11 @@
 import 'package:abushakir/abushakir.dart';
-import 'package:eccalendar/screens/about_screen.dart';
-import 'package:eccalendar/screens/convert_screen.dart';
-import 'package:eccalendar/screens/month_screen.dart';
-import 'package:eccalendar/screens/settings_screen.dart';
-import 'package:eccalendar/state/state_manager.dart';
-import 'package:eccalendar/utils/eth_utils.dart';
-import 'package:eccalendar/utils/themedata_extension.dart';
+import '/screens/about_screen.dart';
+import '/screens/convert_screen.dart';
+import '/screens/month_screen.dart';
+import '/screens/settings_screen.dart';
+import '/state/state_manager.dart';
+import '/utils/eth_utils.dart';
+import '/utils/themedata_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

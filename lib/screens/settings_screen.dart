@@ -1,4 +1,4 @@
-import 'package:eccalendar/state/state_manager.dart';
+import '../state/state_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

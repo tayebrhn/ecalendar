@@ -1,6 +1,6 @@
 import 'package:abushakir/abushakir.dart';
-import 'package:eccalendar/state/state_manager.dart';
-import 'package:eccalendar/widgets/month_widget.dart';
+import '../state/state_manager.dart';
+import '../widgets/month_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/eth_utils.dart';

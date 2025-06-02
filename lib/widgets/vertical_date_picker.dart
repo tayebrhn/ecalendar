@@ -1,6 +1,6 @@
 import 'package:abushakir/abushakir.dart';
-import 'package:eccalendar/utils/eth_utils.dart';
-import 'package:eccalendar/utils/themedata_extension.dart';
+import '../utils/eth_utils.dart';
+import '../utils/themedata_extension.dart';
 import 'package:flutter/material.dart';
 
 class VerticalDatePicker extends StatefulWidget {
