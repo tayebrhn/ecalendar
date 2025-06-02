@@ -1,7 +1,8 @@
 name: ecalendar
-description: "A new Flutter project."
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
+description: >
+  YeKen Mekuteria (የቀን መቁጠሪያ) is an Ethiopian calendar app that displays a full month view alongside the Gregorian calendar. 
+  It supports date conversion, shows selected events, and is actively being developed with more features to come.
+
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
@@ -34,10 +35,12 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  abushakir: "^1.0.0"
-  intl: ^0.20.2
-  provider: ^6.1.5
-  shared_preferences: ^2.5.3
+  abushakir: ^1.0.0
+  intl: any
+  provider: any
+  shared_preferences: any
+  url_launcher: any
+  package_info_plus: any
 
 
 dev_dependencies:
