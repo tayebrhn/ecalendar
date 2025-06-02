@@ -48,9 +48,8 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
       context,
       listen: false,
     );
-    return Card(
-                    color: Colors.grey[200],
-
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2,vertical: 5),
       child: Column(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,

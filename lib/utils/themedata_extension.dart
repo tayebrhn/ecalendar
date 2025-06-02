@@ -109,8 +109,10 @@ class CalendarThemeData extends ThemeExtension<CalendarThemeData> {
       weekendDayTextColor: weekendDayTextColor ?? this.weekendDayTextColor,
       disabledDayTextColor: disabledDayTextColor ?? this.disabledDayTextColor,
       rangeSelectionColor: rangeSelectionColor ?? this.rangeSelectionColor,
-      rangeSelectionEdgeColor: rangeSelectionEdgeColor ?? this.rangeSelectionEdgeColor,
-      headerBackgroundColor: headerBackgroundColor ?? this.headerBackgroundColor,
+      rangeSelectionEdgeColor:
+          rangeSelectionEdgeColor ?? this.rangeSelectionEdgeColor,
+      headerBackgroundColor:
+          headerBackgroundColor ?? this.headerBackgroundColor,
       headerTextColor: headerTextColor ?? this.headerTextColor,
       weekdayTextColor: weekdayTextColor ?? this.weekdayTextColor,
     );
@@ -118,22 +120,38 @@ class CalendarThemeData extends ThemeExtension<CalendarThemeData> {
 
   @override
   ThemeExtension<CalendarThemeData> lerp(
-      ThemeExtension<CalendarThemeData>? other, double t) {
+    ThemeExtension<CalendarThemeData>? other,
+    double t,
+  ) {
     if (other is! CalendarThemeData) {
       return this;
     }
     return CalendarThemeData(
-      eventIndicatorColor: Color.lerp(eventIndicatorColor, other.eventIndicatorColor, t)!,
-      todayHighlightColor: Color.lerp(todayHighlightColor, other.todayHighlightColor, t)!,
-      selectedDayColor: Color.lerp(selectedDayColor, other.selectedDayColor, t)!,
-      selectedDayTextColor: Color.lerp(selectedDayTextColor, other.selectedDayTextColor, t)!,
-      weekendDayTextColor: Color.lerp(weekendDayTextColor, other.weekendDayTextColor, t)!,
-      disabledDayTextColor: Color.lerp(disabledDayTextColor, other.disabledDayTextColor, t)!,
-      rangeSelectionColor: Color.lerp(rangeSelectionColor, other.rangeSelectionColor, t)!,
-      rangeSelectionEdgeColor: Color.lerp(rangeSelectionEdgeColor, other.rangeSelectionEdgeColor, t)!,
-      headerBackgroundColor: Color.lerp(headerBackgroundColor, other.headerBackgroundColor, t)!,
+      eventIndicatorColor:
+          Color.lerp(eventIndicatorColor, other.eventIndicatorColor, t)!,
+      todayHighlightColor:
+          Color.lerp(todayHighlightColor, other.todayHighlightColor, t)!,
+      selectedDayColor:
+          Color.lerp(selectedDayColor, other.selectedDayColor, t)!,
+      selectedDayTextColor:
+          Color.lerp(selectedDayTextColor, other.selectedDayTextColor, t)!,
+      weekendDayTextColor:
+          Color.lerp(weekendDayTextColor, other.weekendDayTextColor, t)!,
+      disabledDayTextColor:
+          Color.lerp(disabledDayTextColor, other.disabledDayTextColor, t)!,
+      rangeSelectionColor:
+          Color.lerp(rangeSelectionColor, other.rangeSelectionColor, t)!,
+      rangeSelectionEdgeColor:
+          Color.lerp(
+            rangeSelectionEdgeColor,
+            other.rangeSelectionEdgeColor,
+            t,
+          )!,
+      headerBackgroundColor:
+          Color.lerp(headerBackgroundColor, other.headerBackgroundColor, t)!,
       headerTextColor: Color.lerp(headerTextColor, other.headerTextColor, t)!,
-      weekdayTextColor: Color.lerp(weekdayTextColor, other.weekdayTextColor, t)!,
+      weekdayTextColor:
+          Color.lerp(weekdayTextColor, other.weekdayTextColor, t)!,
     );
   }
 
@@ -167,3 +185,17 @@ class CalendarThemeData extends ThemeExtension<CalendarThemeData> {
     weekdayTextColor: Color(0xFFCCC2DC),
   );
 }
+
+final ThemeData lightTheme = ThemeData(
+  brightness: Brightness.light,
+  scaffoldBackgroundColor: Colors.white,
+  textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.black)),
+  primaryColor: Colors.black87,
+);
+
+final ThemeData darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  scaffoldBackgroundColor: Colors.black,
+  textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.white)),
+  primaryColor: Colors.white,
+);

@@ -1,6 +1,7 @@
 import 'package:abushakir/abushakir.dart';
 import 'package:eccalendar/utils/eth_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum PageType { year, month, convert, settings }
 
@@ -141,23 +142,55 @@ class CalEventProvider with ChangeNotifier {
   }
 }
 
+enum AppThemeMode { system, light, dark }
+
 class ThemeProvider with ChangeNotifier {
-  ThemeMode _brightness = ThemeMode.system;
-  set brightness(ThemeMode b) {
-    _brightness = b;
-    notifyListeners();
+  static const _themeKey = 'thememode';
+
+  AppThemeMode _themeMode = AppThemeMode.system;
+
+  bool _isInitialized = false;
+
+  ThemeProvider() {
+    _loadTheme();
   }
 
-  ThemeMode get brightness {
-    return _brightness;
-  }
+  bool get isInitialized => _isInitialized;
 
-  void switchTheme(bool dark) {
-    if (dark) {
-      _brightness = ThemeMode.dark;
-      notifyListeners();
+  AppThemeMode get themeMode => _themeMode;
+
+  ThemeMode get currentTheme {
+    switch (_themeMode) {
+      case AppThemeMode.light:
+        return ThemeMode.light;
+      case AppThemeMode.dark:
+        return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
     }
-    _brightness = ThemeMode.light;
-    notifyListeners();
   }
+
+void setTheme(AppThemeMode mode){
+  _themeMode =mode;
+  _saveTheme(mode);
+  notifyListeners();
+}
+Future<void> _loadTheme() async {
+  final prefs = await SharedPreferences.getInstance();
+  final saved= prefs.getString(_themeKey);
+  AppThemeMode.values.firstWhere((element) =>
+     element.toString()==saved,orElse: ()=>AppThemeMode.system
+  ,);
+  _isInitialized=true;
+  notifyListeners();
+}
+
+
+  
+  Future<void> _saveTheme(AppThemeMode mode) async{
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_themeKey, mode.toString());
+  }
+
+  
 }

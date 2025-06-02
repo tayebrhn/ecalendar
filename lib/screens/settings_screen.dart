@@ -10,7 +10,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true;
   bool _darkModeEnabled = false;
   void _hadleSwitch(bool value) {
     // Provider.of<ThemeProvider>(context, listen: false).switchTheme(value);
@@ -21,6 +20,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isSystem = themeProvider.themeMode == AppThemeMode.system;
+    final isDark = themeProvider.themeMode == AppThemeMode.dark;
     return Padding(
       padding: EdgeInsets.all(16.0),
       child: Column(
@@ -29,24 +31,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Card(
             child: Column(
               children: [
-                // SwitchListTile(
-                //   title: Text('Enable Notifications'),
-                //   subtitle: Text('Receive push notifications'),
-                //   value: _notificationsEnabled,
-                //   onChanged: (value) {
-                //     setState(() {
-                //       _notificationsEnabled = value;
-                //     });
-                //   },
-                // ),
-                // Divider(height: 1),
+                SwitchListTile(
+                  title: Text('Use System Theme'),
+                  subtitle: Text('Automatically update theme'),
+                  value: isSystem,
+                  onChanged: (useSystem) {
+                    themeProvider.setTheme(
+                      useSystem
+                          ? AppThemeMode.system
+                          : isDark
+                          ? AppThemeMode.dark
+                          : AppThemeMode.light,
+                    );
+                  },
+                ),
+                Divider(height: 1),
                 SwitchListTile(
                   title: Text('Dark Mode'),
                   subtitle: Text('Enable dark theme'),
-                  value: _darkModeEnabled,
-                  onChanged: (value) {
-                      _hadleSwitch(value);
-                  },
+                  value: isDark,
+                  onChanged:
+                      isSystem
+                          ? null
+                          : (isDarkSelected) {
+                            themeProvider.setTheme(
+                              isDarkSelected
+                                  ? AppThemeMode.dark
+                                  : AppThemeMode.light,
+                            );
+                          },
                 ),
               ],
             ),

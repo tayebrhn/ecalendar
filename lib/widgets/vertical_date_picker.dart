@@ -1,5 +1,6 @@
 import 'package:abushakir/abushakir.dart';
 import 'package:eccalendar/utils/eth_utils.dart';
+import 'package:eccalendar/utils/themedata_extension.dart';
 import 'package:flutter/material.dart';
 
 class VerticalDatePicker extends StatefulWidget {
@@ -99,101 +100,114 @@ class _VerticalDatePickerState extends State<VerticalDatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Year picker
-        Expanded(
-          child: Container(
-            height: 250,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: ListWheelScrollView.useDelegate(
-              controller: _yearController,
-              itemExtent: 50,
-              perspective: 0.005,
-              diameterRatio: 1.5,
-              physics: const FixedExtentScrollPhysics(),
-              onSelectedItemChanged: (index) {
-                _onDateChanged();
-              },
-              childDelegate: ListWheelChildBuilderDelegate(
-                builder: (context, index) {
-                  if (index < 0 || index >= _years.length) {
-                    return null;
-                  }
-                  return _buildDateItem(_years[index].toString());
+    final theme = Theme.of(context).extension<CalendarThemeData>();
+
+    return Padding(
+
+      padding: const EdgeInsets.all(10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Year picker
+          Expanded(
+            child: Container(
+              height: 250,
+              decoration: BoxDecoration(
+                color: 
+                    Theme.of(context).brightness == Brightness.light
+                        ? Colors.grey[200]
+                        : Colors.grey[500],              borderRadius: BorderRadius.circular(10),
+              ),
+              child: ListWheelScrollView.useDelegate(
+                controller: _yearController,
+                itemExtent: 50,
+                perspective: 0.005,
+                diameterRatio: 1.5,
+                physics: const FixedExtentScrollPhysics(),
+                onSelectedItemChanged: (index) {
+                  _onDateChanged();
                 },
-                childCount: _years.length,
+                childDelegate: ListWheelChildBuilderDelegate(
+                  builder: (context, index) {
+                    if (index < 0 || index >= _years.length) {
+                      return null;
+                    }
+                    return _buildDateItem(_years[index].toString());
+                  },
+                  childCount: _years.length,
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(width: 10),
-        // Month picker
-        Expanded(
-          child: Container(
-            height: 250,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: ListWheelScrollView.useDelegate(
-              controller: _monthController,
-              itemExtent: 50,
-              perspective: 0.005,
-              diameterRatio: 1.5,
-              physics: const FixedExtentScrollPhysics(),
-              onSelectedItemChanged: (index) {
-                _onDateChanged();
-              },
-              childDelegate: ListWheelChildBuilderDelegate(
-                builder: (context, index) {
-                  if (index < 0 || index >= _months.length) {
-                    return null;
-                  }
-                  return _buildDateItem(
-                    ETC(year: 2000, month: index + 1).monthName!,
-                  );
+          const SizedBox(width: 10),
+          // Month picker
+          Expanded(
+            child: Container(
+              height: 250,
+              decoration: BoxDecoration(
+                color:
+                    Theme.of(context).brightness == Brightness.light
+                        ? Colors.grey[200]
+                        : Colors.grey[500],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: ListWheelScrollView.useDelegate(
+                controller: _monthController,
+                itemExtent: 50,
+                perspective: 0.005,
+                diameterRatio: 1.5,
+                physics: const FixedExtentScrollPhysics(),
+                onSelectedItemChanged: (index) {
+                  _onDateChanged();
                 },
-                childCount: _months.length,
+                childDelegate: ListWheelChildBuilderDelegate(
+                  builder: (context, index) {
+                    if (index < 0 || index >= _months.length) {
+                      return null;
+                    }
+                    return _buildDateItem(
+                      ETC(year: 2000, month: index + 1).monthName!,
+                    );
+                  },
+                  childCount: _months.length,
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(width: 10),
-        // Day picker
-        Expanded(
-          child: Container(
-            height: 250,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: ListWheelScrollView.useDelegate(
-              controller: _dayController,
-              itemExtent: 50,
-              perspective: 0.005,
-              diameterRatio: 1.5,
-              physics: const FixedExtentScrollPhysics(),
-              onSelectedItemChanged: (index) {
-                _onDateChanged();
-              },
-              childDelegate: ListWheelChildBuilderDelegate(
-                builder: (context, index) {
-                  if (index < 0 || index >= _days.length) {
-                    return null;
-                  }
-                  return _buildDateItem(_days[index].toString());
+          const SizedBox(width: 10),
+          // Day picker
+          Expanded(
+            child: Container(
+              height: 250,
+              decoration: BoxDecoration(
+                color: 
+                    Theme.of(context).brightness == Brightness.light
+                        ? Colors.grey[200]
+                        : Colors.grey[500],              borderRadius: BorderRadius.circular(10),
+              ),
+              child: ListWheelScrollView.useDelegate(
+                controller: _dayController,
+                itemExtent: 50,
+                perspective: 0.005,
+                diameterRatio: 1.5,
+                physics: const FixedExtentScrollPhysics(),
+                onSelectedItemChanged: (index) {
+                  _onDateChanged();
                 },
-                childCount: _days.length,
+                childDelegate: ListWheelChildBuilderDelegate(
+                  builder: (context, index) {
+                    if (index < 0 || index >= _days.length) {
+                      return null;
+                    }
+                    return _buildDateItem(_days[index].toString());
+                  },
+                  childCount: _days.length,
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

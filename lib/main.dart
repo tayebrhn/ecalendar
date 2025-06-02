@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
 
-      themeMode: context.read<ThemeProvider>().brightness,
+      themeMode: Provider.of<ThemeProvider>(context,listen: false).currentTheme,
       home: MainScreen(),
     );
   }
@@ -64,7 +64,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 2;
 
   final List<Widget> _screens = [
     MonthlyScreen(),
@@ -217,7 +217,7 @@ class _MainScreenState extends State<MainScreen> {
     required int index,
   }) {
     bool isSelected = _selectedIndex == index;
-
+final theme =Theme.of(context).extension<CalendarThemeData>();
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
@@ -232,7 +232,7 @@ class _MainScreenState extends State<MainScreen> {
         title: Text(
           title,
           style: TextStyle(
-            color: isSelected ? Colors.blue[700] : Colors.black87,
+            color: isSelected ? Colors.blue[700] : theme?.headerTextColor,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
         ),

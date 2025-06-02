@@ -174,7 +174,6 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
                 cellDate.moment,
               ).day.toString(),
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-              textAlign: TextAlign.end,
             ),
             hasEvents(cellDate)
                 ? Container(
