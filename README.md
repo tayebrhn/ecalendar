@@ -5,9 +5,16 @@
 ---
 
 ## 🖼️ Screenshots
+<div style="display: flex; flex-wrap: wrap; gap: 10px;">
 
-<img src="screenshots/month_view.png" width="300">
-<img src="screenshots/dark_mode.png" width="300">
+![photo_1_2025-06-02_17-53-17](https://github.com/user-attachments/assets/2a4dce34-8647-467a-a6b1-1f23ec36efa2)
+![photo_2_2025-06-02_17-53-17](https://github.com/user-attachments/assets/86c533b2-0777-4c00-8142-aafe42bfba07)
+![photo_6_2025-06-02_17-53-17](https://github.com/user-attachments/assets/21343a95-6f0c-487b-8f49-502f3e505297)
+![photo_5_2025-06-02_17-53-17](https://github.com/user-attachments/assets/c385b429-6b25-4203-8ff7-20a5fb559295)
+![photo_4_2025-06-02_17-53-17](https://github.com/user-attachments/assets/c1b1be92-5e3d-469a-8704-f33a2fa50447)
+![photo_3_2025-06-02_17-53-17](https://github.com/user-attachments/assets/0ee8ba66-4d52-43cd-88f2-b07f2c68c932)
+</div>
+
 
 ---
 
@@ -34,7 +41,7 @@ git clone https://github.com/yourusername/ken-mekuteria.git
 cd ken-mekuteria
 flutter pub get
 flutter run
-
+```
 
 
 | Package                                                             | Description                                  |
@@ -50,9 +57,3 @@ flutter run
 📜 License
 This project is licensed under the MIT License.
 See the LICENSE file for details.
-
-👨‍💻 Author
-Developed by Your Name
-Portfolio or LinkedIn
-GitHub
-
