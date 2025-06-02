@@ -1,6 +1,5 @@
 import 'package:abushakir/abushakir.dart';
 import '../utils/eth_utils.dart';
-import '../utils/themedata_extension.dart';
 import 'package:flutter/material.dart';
 
 class VerticalDatePicker extends StatefulWidget {
@@ -64,7 +63,7 @@ class _VerticalDatePickerState extends State<VerticalDatePicker> {
   }
 
   void _updateDays() {
-    print(_selectedDate.month);
+    // print(_selectedDate.month);
     _days = List<int>.generate(
       _getDaysInMonth(_selectedDate.year, _selectedDate.month),
       (index) => index + 1,
@@ -100,7 +99,7 @@ class _VerticalDatePickerState extends State<VerticalDatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).extension<CalendarThemeData>();
+    // final theme = Theme.of(context).extension<CalendarThemeData>();
 
     return Padding(
 

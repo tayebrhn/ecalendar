@@ -37,17 +37,17 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<EtDatetime> daycell;
+    // List<EtDatetime> daycell;
     // final pageManager =
     // //     Provider.of<DateChangeNotifier>(context, listen: false).pageController;
     // final CalendarThemeData calendarTheme =
     //     Theme.of(context).extension<CalendarThemeData>()!;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // final ColorScheme colorScheme = Theme.of(context).colorScheme;
     // final PageProvider pageProvider = Provider.of<PageProvider>(context);
-    DateChangeNotifier dateChangeProvider = Provider.of<DateChangeNotifier>(
-      context,
-      listen: false,
-    );
+    // DateChangeNotifier dateChangeProvider = Provider.of<DateChangeNotifier>(
+    //   context,
+    //   listen: false,
+    // );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2,vertical: 5),
       child: Column(
@@ -102,7 +102,7 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
 
   Widget _buildWeekdayHeaders(int startOfWeek) {
     // Generate weekday names starting from custom start day
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     // final weekdays = List.generate(7, (index) {
     //   final weekday =

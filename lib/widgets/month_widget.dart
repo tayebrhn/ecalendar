@@ -69,17 +69,17 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
     if (dayCells == null) {
       return Center(child: CircularProgressIndicator());
     }
-    final CalendarThemeData calendarTheme =
-        Theme.of(context).extension<CalendarThemeData>()!;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    DateChangeNotifier dateChangeNotifier = Provider.of<DateChangeNotifier>(
-      context,
-      listen: true,
-    );
-    CalEventProvider calEventNotifier = Provider.of<CalEventProvider>(
-      context,
-      listen: false,
-    );
+    // final CalendarThemeData calendarTheme =
+    //     Theme.of(context).extension<CalendarThemeData>()!;
+    // final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // DateChangeNotifier dateChangeNotifier = Provider.of<DateChangeNotifier>(
+    //   context,
+    //   listen: true,
+    // );
+    // CalEventProvider calEventNotifier = Provider.of<CalEventProvider>(
+    //   context,
+    //   listen: false,
+    // );
     return Table(children: _buildCalendarRows());
   }
 
@@ -104,7 +104,7 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
   Widget _buildDayCell(EtDatetime cellDate) {
     final CalendarThemeData calendarTheme =
         Theme.of(context).extension<CalendarThemeData>()!;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // final ColorScheme colorScheme = Theme.of(context).colorScheme;
     DateChangeNotifier dateChangeNotifier = Provider.of<DateChangeNotifier>(
       context,
       listen: true,

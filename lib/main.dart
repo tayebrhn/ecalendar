@@ -64,7 +64,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 2;
+  int _selectedIndex = 0;
 
   final List<Widget> _screens = [
     MonthlyScreen(),
@@ -84,8 +84,8 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    EtDatetime dateChangeProvider =
-        Provider.of<DateChangeNotifier>(context, listen: true).changeDate;
+    // EtDatetime dateChangeProvider =
+    //     Provider.of<DateChangeNotifier>(context, listen: true).changeDate;
 
     return Scaffold(
       appBar: AppBar(
