@@ -16,9 +16,6 @@ void main() {
         ChangeNotifierProvider<DateChangeNotifier>(
           create: (context) => DateChangeNotifier(),
         ),
-        ChangeNotifierProvider<PageProvider>(
-          create: (context) => PageProvider(),
-        ),
         ChangeNotifierProvider<CalEventProvider>(
           create: (context) => CalEventProvider(),
         ),
@@ -50,7 +47,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
 
-      themeMode: Provider.of<ThemeProvider>(context,listen: true).currentTheme,
+      themeMode: Provider.of<ThemeProvider>(context, listen: true).currentTheme,
       home: MainScreen(),
     );
   }
@@ -64,7 +61,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 3;
+  int _selectedIndex = 0;
 
   final List<Widget> _screens = [
     MonthlyScreen(),
@@ -217,7 +214,7 @@ class _MainScreenState extends State<MainScreen> {
     required int index,
   }) {
     bool isSelected = _selectedIndex == index;
-final theme =Theme.of(context).extension<CalendarThemeData>();
+    final theme = Theme.of(context).extension<CalendarThemeData>();
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(

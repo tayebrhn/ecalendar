@@ -3,7 +3,7 @@ import '../utils/eth_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum PageType { year, month, convert, settings }
+// enum PageType { year, month, convert, settings }
 
 class DateChangeNotifier with ChangeNotifier {
   EtDatetime _selected = EtDatetime.now();
@@ -101,35 +101,35 @@ class DateChangeNotifier with ChangeNotifier {
   }
 }
 
-class PageProvider with ChangeNotifier {
-  PageType _currentPage = PageType.month;
-  bool _isSidebarOpen = false;
+// class PageProvider with ChangeNotifier {
+//   PageType _currentPage = PageType.month;
+//   bool _isSidebarOpen = false;
 
-  PageType get currentPage => _currentPage;
-  bool get isSidebarOpen => _isSidebarOpen;
+//   PageType get currentPage => _currentPage;
+//   bool get isSidebarOpen => _isSidebarOpen;
 
-  void openSideBar() {
-    _isSidebarOpen = true;
-    notifyListeners();
-  }
+//   void openSideBar() {
+//     _isSidebarOpen = true;
+//     notifyListeners();
+//   }
 
-  void closeSideBar() {
-    _isSidebarOpen = false;
-    notifyListeners();
-  }
+//   void closeSideBar() {
+//     _isSidebarOpen = false;
+//     notifyListeners();
+//   }
 
-  void switchPage(PageType page) async {
-    if (_currentPage != page) {
-      _isSidebarOpen = false;
-      notifyListeners();
-      await Future.delayed(Duration(milliseconds: 300));
-      _currentPage = page;
-      notifyListeners();
-    } else {
-      closeSideBar();
-    }
-  }
-}
+//   void switchPage(PageType page) async {
+//     if (_currentPage != page) {
+//       _isSidebarOpen = false;
+//       notifyListeners();
+//       await Future.delayed(Duration(milliseconds: 300));
+//       _currentPage = page;
+//       notifyListeners();
+//     } else {
+//       closeSideBar();
+//     }
+//   }
+// }
 
 class CalEventProvider with ChangeNotifier {
   BealEvent _bealEvent = BealEvent.empty();
@@ -194,3 +194,4 @@ Future<void> _loadTheme() async {
 
   
 }
+

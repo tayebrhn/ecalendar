@@ -126,7 +126,7 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => EtDateDetails(selectedDate: cellDate),
+              builder: (context) => EtDateScreen(selectedDate: cellDate),
             ),
           );
         }
