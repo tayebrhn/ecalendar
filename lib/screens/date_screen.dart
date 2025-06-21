@@ -20,39 +20,8 @@ class EtDateScreen extends StatelessWidget {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Column(
-        children: [
-          Card(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(padding: const EdgeInsets.all(5),child: Icon(Icons.event,size: 35,)),
-                  Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          calEventNotifier.bealEvent.beal,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          '${calEventNotifier.bealEvent.month} '
-                          ' ${calEventNotifier.bealEvent.date}',
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+      //todo
+      body: Text("Todo"),
     );
   }
 }

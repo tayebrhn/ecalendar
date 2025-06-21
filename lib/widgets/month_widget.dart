@@ -24,20 +24,22 @@ class MonthlyWidget extends StatefulWidget {
 class _MonthlyWidgetState extends State<MonthlyWidget> {
   List<EtDatetime>? dayCells;
   final Map<int, List<EtDatetime>> _monthCache = {};
-  int _currentMonth = DateTime.now().month;
+  final int _currentMonth = DateTime.now().month;
 
   @override
   void initState() {
     super.initState();
     computeMonthDays();
   }
-@override
+
+  @override
   void didUpdateWidget(covariant MonthlyWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.date != widget.date) {
       computeMonthDays();
     }
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -122,6 +124,79 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
       onTap: () {
         dateChangeNotifier.selectedDate = cellDate;
         calEventNotifier.bealEvent = bealEvent(cellDate);
+        if (hasEvents(cellDate)) {
+          final mediaQuery = MediaQuery.of(context);
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(cellDate.day.toString()),
+                    Text(cellDate.monthGeez!),
+                    Divider(),
+                  ],
+                ),
+                content: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    SizedBox(
+                      width: mediaQuery.size.width * 0.85,
+                      height: mediaQuery.size.height * 0.45,
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(2),
+                                child: Icon(Icons.event, size: 25),
+                              ),
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      calEventNotifier.bealEvent.beal,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 40),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0, // Half outside the dialog
+                      right: 0,
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          // Handle FAB press
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      EtDateScreen(selectedDate: cellDate),
+                            ),
+                          );
+                        },
+                        child: Icon(Icons.add),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        }
         if (isSelected) {
           Navigator.push(
             context,
