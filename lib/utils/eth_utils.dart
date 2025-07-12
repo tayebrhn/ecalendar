@@ -1,4 +1,5 @@
 import 'package:abushakir/abushakir.dart';
+import 'package:intl/intl.dart';
 
 const initialPage = 10000;
 const int dayGrid = 42;
@@ -18,6 +19,43 @@ final months = [
   'ነሐሴ',
   'ጳጉሜ',
 ];
+
+final englishMonthNames = [
+  'Meskerem',
+  'Tikimit',
+  'Hidar',
+  'Tahsas',
+  'Tir',
+  'Yekatit',
+  'Megabit',
+  'Miyazya',
+  'Ginbot',
+  'Sene',
+  'Hamle',
+  'Nehase',
+  'Pagume',
+];
+
+String mYYYY(EtDatetime date) {
+  String monthName = englishMonthNames[date.month - 1];
+  String year = date.year.toString();
+
+  return "$monthName $year";
+}
+
+String yYYYMD(EtDatetime date) {
+  String monthName = englishMonthNames[date.month - 1];
+  String year = date.year.toString();
+  String day = date.day.toString();
+
+  return "$year $monthName $day";
+}
+
+String toGreg(EtDatetime date) {
+  return DateFormat(
+    'MMMM yyyy',
+  ).format(DateTime.fromMillisecondsSinceEpoch(date.moment));
+}
 
 String getDayName(EtDatetime index) {
   if (index.day == index.weekday) {

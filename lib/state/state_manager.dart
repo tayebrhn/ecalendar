@@ -3,66 +3,35 @@ import '../utils/eth_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// enum PageType { year, month, convert, settings }
-
 class DateChangeNotifier with ChangeNotifier {
   EtDatetime _selected = EtDatetime.now();
   EtDatetime _changeDate = EtDatetime.now();
+  int _currentPage = initialPage;
+  final PageController _pageController = PageController(
+    initialPage: initialPage,
+  );
 
-  // int _currentPageIndex = EthUtils.initialPage;
+  PageController get pageController => _pageController;
 
-  // PageController get pageController => _pageController;
-  // int get currentPageIndex => _currentPageIndex;
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
-  // set currentPageIndex(int index) {
-  //   _currentPageIndex = index;
-  //   notifyListeners();
-  // }
+  get currentPage => _currentPage;
+  void updatePageNum(int num) {
+    _currentPage = num;
+  }
 
-  // void jumpToPage(int page) {
-  //   _pageController.jumpTo(page as double);
-  //   _currentPageIndex = page;
-  //   notifyListeners();
-  // }
-
-  // void animateToPage(int page) {
-  //   _pageController.animateToPage(
-  //     page,
-  //     duration: Duration(milliseconds: 300),
-  //     curve: Curves.easeOut,
-  //   );
-  //   _currentPageIndex = page;
-  //   notifyListeners();
-  // }
-
-  // void updateCurrentPageindex(int index) {
-  //   _currentPageIndex = index;
-  //   notifyListeners();
-  // }
-
-  // void jumpToDay() {
-  //   var newDate = EtDatetime.now();
-  //   // _selectedtDate = newDate;
-  //   // Jump to the correct page if needed
-  //   final diff =
-  //       (newDate.year - EtDatetime.now().year) * 13 +
-  //       (newDate.month - EtDatetime.now().month);
-  //   print("CURRENT INDEX$_currentPageIndex");
-
-  //   _pageController.animateToPage(
-  //     10000,
-  //     duration: Duration(milliseconds: 100),
-  //     curve: Curves.easeOut,
-  //   );
-  //   _currentPageIndex = 10000;
-  //   _changeDate = today;
-  // }
-
-  // @override
-  // void dispose() {
-  //   _pageController.dispose();
-  //   super.dispose();
-  // }
+  void ifPageSet() {
+    _pageController.animateToPage(
+      _currentPage,
+      duration: Duration(milliseconds: 2),
+      curve: Curves.bounceIn,
+    );
+    // if (_currentPage != initialPage) {}
+  }
 
   set changeDate(EtDatetime date) {
     _changeDate = date;
@@ -73,15 +42,6 @@ class DateChangeNotifier with ChangeNotifier {
     _changeDate = today;
     notifyListeners();
   }
-  // EtDatetime getSetDate(int index) {
-  //   _changeDate = EtDatetime(
-  //     year: today.year + (index - _currentPageIndex) ~/ 13,
-  //     month: today.month + (index - _currentPageIndex) % 13,
-  //     day: 1,
-  //   );
-  //   notifyListeners();
-  //   return _changeDate;
-  // }
 
   EtDatetime get changeDate {
     return _changeDate;
@@ -100,36 +60,6 @@ class DateChangeNotifier with ChangeNotifier {
     notifyListeners();
   }
 }
-
-// class PageProvider with ChangeNotifier {
-//   PageType _currentPage = PageType.month;
-//   bool _isSidebarOpen = false;
-
-//   PageType get currentPage => _currentPage;
-//   bool get isSidebarOpen => _isSidebarOpen;
-
-//   void openSideBar() {
-//     _isSidebarOpen = true;
-//     notifyListeners();
-//   }
-
-//   void closeSideBar() {
-//     _isSidebarOpen = false;
-//     notifyListeners();
-//   }
-
-//   void switchPage(PageType page) async {
-//     if (_currentPage != page) {
-//       _isSidebarOpen = false;
-//       notifyListeners();
-//       await Future.delayed(Duration(milliseconds: 300));
-//       _currentPage = page;
-//       notifyListeners();
-//     } else {
-//       closeSideBar();
-//     }
-//   }
-// }
 
 class CalEventProvider with ChangeNotifier {
   BealEvent _bealEvent = BealEvent.empty();
@@ -170,28 +100,25 @@ class ThemeProvider with ChangeNotifier {
     }
   }
 
-void setTheme(AppThemeMode mode){
-  _themeMode =mode;
-  _saveTheme(mode);
-  notifyListeners();
-}
-Future<void> _loadTheme() async {
-  final prefs = await SharedPreferences.getInstance();
-  final saved= prefs.getString(_themeKey);
-  AppThemeMode.values.firstWhere((element) =>
-     element.toString()==saved,orElse: ()=>AppThemeMode.system
-  ,);
-  _isInitialized=true;
-  notifyListeners();
-}
+  void setTheme(AppThemeMode mode) {
+    _themeMode = mode;
+    _saveTheme(mode);
+    notifyListeners();
+  }
 
+  Future<void> _loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(_themeKey);
+    AppThemeMode.values.firstWhere(
+      (element) => element.toString() == saved,
+      orElse: () => AppThemeMode.system,
+    );
+    _isInitialized = true;
+    notifyListeners();
+  }
 
-  
-  Future<void> _saveTheme(AppThemeMode mode) async{
+  Future<void> _saveTheme(AppThemeMode mode) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_themeKey, mode.toString());
   }
-
-  
 }
-

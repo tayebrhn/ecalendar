@@ -126,9 +126,14 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
         calEventNotifier.bealEvent = bealEvent(cellDate);
         if (hasEvents(cellDate)) {
           final mediaQuery = MediaQuery.of(context);
-          showDialog(
+          showGeneralDialog(
             context: context,
-            builder: (context) {
+            barrierDismissible: true,
+            barrierLabel:
+                MaterialLocalizations.of(context).modalBarrierDismissLabel,
+            transitionDuration: Duration(milliseconds: 250),
+            barrierColor: Colors.black.withValues(alpha: 0.5),
+            pageBuilder: (context, animation, secondaryAnimation) {
               return AlertDialog(
                 title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,9 +200,17 @@ class _MonthlyWidgetState extends State<MonthlyWidget> {
                 ),
               );
             },
+            transitionBuilder: (context, animation, secondaryAnimation, child) {
+              return ScaleTransition(
+                scale: CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeOutBack,
+                ),
+                child: FadeTransition(opacity: animation, child: child),
+              );
+            },
           );
-        }
-        if (isSelected) {
+        } else if (isSelected) {
           Navigator.push(
             context,
             MaterialPageRoute(

@@ -12,62 +12,41 @@ class MonthlyScreen extends StatefulWidget {
 }
 
 class _MonthlyScreenState extends State<MonthlyScreen> {
-  late final PageController _pageController;
-
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DateChangeNotifier>().ifPageSet();
+      // print(context.read<DateChangeNotifier>().currentPage);
+    });
     super.initState();
-    _pageController = PageController(initialPage: initialPage);
-  }
-
-  @override
-  void didUpdateWidget(covariant MonthlyScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
   }
 
   @override
   void dispose() {
     super.dispose();
-    _pageController.dispose();
-    //not advisable to dispose provider objects
-    // pageProvider.dispose();
-    // dateChangeProvider.dispose();
-    // calEvent.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // List<EtDatetime> daycell;
-    // final pageManager =
-    // //     Provider.of<DateChangeNotifier>(context, listen: false).pageController;
-    // final CalendarThemeData calendarTheme =
-    //     Theme.of(context).extension<CalendarThemeData>()!;
-    // final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    // final PageProvider pageProvider = Provider.of<PageProvider>(context);
-    // DateChangeNotifier dateChangeProvider = Provider.of<DateChangeNotifier>(
-    //   context,
-    //   listen: false,
-    // );
+    final pageCtrlr =
+        Provider.of<DateChangeNotifier>(context, listen: false).pageController;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2,vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
       child: Column(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 1,
-            child: _buildWeekdayHeaders(2),
-          ),
+          Expanded(flex: 1, child: _buildWeekdayHeaders(2)),
           Expanded(
             flex: 11,
             child: PageView.builder(
-              controller: _pageController,
+              controller: pageCtrlr,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
                 // dateChangeProvider.changeDate =
                 final EtDatetime date = monthOffset(index);
-                  
+
                 // WidgetsBinding.instance.addPostFrameCallback((_) {
                 //   context.read<DateChangeNotifier>().changeDate = date;
                 // });
@@ -92,6 +71,7 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
                 context.read<DateChangeNotifier>().changeDate = monthOffset(
                   index,
                 );
+                context.read<DateChangeNotifier>().updatePageNum(index);
               },
             ),
           ),

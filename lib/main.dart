@@ -1,4 +1,3 @@
-import 'package:abushakir/abushakir.dart';
 import '/screens/about_screen.dart';
 import '/screens/convert_screen.dart';
 import '/screens/month_screen.dart';
@@ -70,8 +69,6 @@ class _MainScreenState extends State<MainScreen> {
     AboutScreen(),
   ];
 
-  final List<String> _titles = ['Month', 'Convert', 'Settings', 'About'];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -81,19 +78,22 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // EtDatetime dateChangeProvider =
-    //     Provider.of<DateChangeNotifier>(context, listen: true).changeDate;
-
+    final pageCtrlr =
+        Provider.of<DateChangeNotifier>(context, listen: true).pageController;
+    final dateChange =
+        Provider.of<DateChangeNotifier>(context, listen: true).changeDate;
+    final date = Provider.of<DateChangeNotifier>(context, listen: true).today;
     return Scaffold(
       appBar: AppBar(
-        title: Consumer<DateChangeNotifier>(
-          builder: (context, value, child) {
-            return Text(
-              _selectedIndex == 0
-                  ? '${value.changeDate.monthGeez} ${value.changeDate.year}'
-                  : _titles[_selectedIndex],
-            );
-          },
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              mYYYY(dateChange),
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(toGreg(dateChange), style: TextStyle(fontSize: 14)),
+          ],
         ),
         backgroundColor: Colors.blue[700],
         foregroundColor: Colors.white,
@@ -101,22 +101,11 @@ class _MainScreenState extends State<MainScreen> {
         actions: [
           InkWell(
             onTap: () {
-              // Provider.of<DateChangeNotifier>(context, listen: false)
-              //     .changeDate = EtDatetime.now();
-              // dateChangeProvider.jumpToDay();
-              // dateChangeProvider.selectedDate =
-              // dateChangeProvider.changeDate = dateChangeProvider.today;
-
-              // setState(() {
-              // var newDate = EtDatetime.now();
-              // _currentDate = newDate;
-              // _selectedtDate = newDate;
-              // // Jump to the correct page if needed
-              // final diff =
-              //     (dateChangeProvider.changeDate.year - dateChangeProvider.today.year) * 13 +
-              //     (dateChangeProvider.changeDate.month - dateChangeProvider.today.month);
-              // _pageController.jumpToPage(EthUtils.initialPage);
-              //});
+              pageCtrlr.animateToPage(
+                initialPage,
+                duration: Duration(milliseconds: 50),
+                curve: Curves.bounceIn,
+              );
             },
             borderRadius: BorderRadius.circular(30),
             child: Padding(
@@ -126,16 +115,13 @@ class _MainScreenState extends State<MainScreen> {
                 children: [
                   const Icon(Icons.calendar_today_rounded, size: 30),
                   Positioned(
-                    top: 0,
+                    top: 3,
                     child: Container(
                       padding: const EdgeInsets.all(5),
                       constraints: BoxConstraints(minWidth: 20, minHeight: 20),
                       child: Text(
-                        '${EtDatetime.now().day}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
+                        '${date.day}',
+                        style: TextStyle(fontSize: 14),
                       ),
                     ),
                   ),
@@ -172,7 +158,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    getDayName(context.read<DateChangeNotifier>().today),
+                    getDayName(date),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -180,8 +166,12 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   ),
                   Text(
-                    '${context.read<DateChangeNotifier>().today.monthGeez!} ${context.read<DateChangeNotifier>().today}',
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                    yYYYMD(date),
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
