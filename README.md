@@ -7,10 +7,14 @@
 ## 🖼️ Screenshots
 
 <p align="center">
-  <img src="assets/monthview.jpg" width="600"/>
-  <img src="assets/drawer.jpg" width="600"/>
-  <img src="assets/event.jpg" width="600"/>
-  <img src="assets/settings.jpg" width="600"/>
+  <p float="left">
+    <img src="assets/monthview.jpg" width="40%"/>
+    <img src="assets/drawer.jpg" width="40%"/>
+  </p>
+  <p float="left">
+    <img src="assets/event.jpg" width="40%"/>
+    <img src="assets/settings.jpg" width="40%"/>
+  </p>
 </p>
 
 ---
