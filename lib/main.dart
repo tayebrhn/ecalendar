@@ -12,21 +12,26 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
 
-void main() {
+void main() async {
+  // WidgetsFlutterBinding.ensureInitialized();
+
+  // final themeProvider = ThemeProvider();
+  // await themeProvider.init();
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider<DateChangeNotifier>(
-          create: (context) => DateChangeNotifier(),
+          create: (_) => DateChangeNotifier(),
         ),
         ChangeNotifierProvider<CalEventProvider>(
-          create: (context) => CalEventProvider(),
+          create: (_) => CalEventProvider(),
         ),
         ChangeNotifierProvider<ThemeProvider>(
-          create: (context) => ThemeProvider(),
+          create: (_) => ThemeProvider()
         ),
         ChangeNotifierProvider<LanguageProvider>(
-          create: (context) => LanguageProvider(),
+          create: (_) => LanguageProvider(),
         ),
       ],
       child: MyApp(),

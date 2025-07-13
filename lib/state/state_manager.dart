@@ -78,15 +78,13 @@ class ThemeProvider with ChangeNotifier {
   static const _themeKey = 'thememode';
 
   AppThemeMode _themeMode = AppThemeMode.system;
-
   bool _isInitialized = false;
 
   ThemeProvider() {
-    _loadTheme();
+    _init();
   }
 
   bool get isInitialized => _isInitialized;
-
   AppThemeMode get themeMode => _themeMode;
 
   ThemeMode get currentTheme {
@@ -95,33 +93,39 @@ class ThemeProvider with ChangeNotifier {
         return ThemeMode.light;
       case AppThemeMode.dark:
         return ThemeMode.dark;
-      default:
-        return ThemeMode.system;
+      case AppThemeMode.system:
+      return ThemeMode.system;
     }
   }
 
-  void setTheme(AppThemeMode mode) {
-    _themeMode = mode;
-    _saveTheme(mode);
+  Future<void> _init() async {
+    await _loadTheme();
+    _isInitialized = true;
     notifyListeners();
   }
 
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString(_themeKey);
-    AppThemeMode.values.firstWhere(
-      (element) => element.toString() == saved,
-      orElse: () => AppThemeMode.system,
-    );
-    _isInitialized = true;
-    notifyListeners();
+
+    if (saved != null) {
+      _themeMode = AppThemeMode.values.firstWhere(
+        (e) => e.name == saved,
+        orElse: () => AppThemeMode.system,
+      );
+    } else {
+      _themeMode = AppThemeMode.system;
+    }
   }
 
-  Future<void> _saveTheme(AppThemeMode mode) async {
+  Future<void> setTheme(AppThemeMode mode) async {
+    _themeMode = mode;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_themeKey, mode.toString());
+    await prefs.setString(_themeKey, mode.name);
+    notifyListeners();
   }
 }
+
 
 class LanguageProvider with ChangeNotifier {
   Locale _locale = const Locale("en");
