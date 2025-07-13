@@ -41,6 +41,8 @@ dependencies:
   shared_preferences: any
   url_launcher: any
   package_info_plus: any
+  flutter_localizations:
+    sdk: flutter
 
 
 dev_dependencies:
@@ -53,6 +55,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  intl_translation: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -64,6 +67,7 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  generate: true
 
   # To add assets to your application, add an assets section, like this:
   # assets:

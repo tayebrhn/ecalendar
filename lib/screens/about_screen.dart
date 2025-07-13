@@ -1,3 +1,4 @@
+import 'package:ecalendar/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -36,7 +37,8 @@ class _AboutScreenState extends State<AboutScreen> {
     } else {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Could not open link')));
+      ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.settings)
+      ));
     }
   }
 
@@ -64,26 +66,25 @@ class _AboutScreenState extends State<AboutScreen> {
           ),
           const SizedBox(height: 24),
           Text(
-            'Ken Mekuteria (የቀን መቁጠሪያ) is an Ethiopian calendar app that displays a full month view alongside the Gregorian calendar.'
-            'Built with Flutter, It supports date conversion, shows selected events, it supports also light/dark modes, theme sync, and is actively being developed with more features to come.',
+            AppLocalizations.of(context)!.appDescription,
             style: theme.textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
           const Divider(height: 32),
           ListTile(
             leading: const Icon(Icons.code),
-            title: const Text('GitHub Repository'),
+            title: Text(AppLocalizations.of(context)!.gitRepo),
             onTap: () => _launchURL('https://github.com/ty-ab'),
           ),
           ListTile(
             leading: const Icon(Icons.person),
-            title: const Text('Developer'),
+            title: Text(AppLocalizations.of(context)!.developer),
             subtitle: const Text('Taye B.'),
             onTap: () => _launchURL('https://notyet.com'),
           ),
           ListTile(
             leading: const Icon(Icons.article),
-            title: const Text('View Open-Source Licenses'),
+            title: Text(AppLocalizations.of(context)!.viewOpenSourceL),
             onTap: () {
               showLicensePage(
                 context: context,

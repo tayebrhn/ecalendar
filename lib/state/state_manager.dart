@@ -3,6 +3,8 @@ import '../utils/eth_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum AppThemeMode { system, light, dark }
+
 class DateChangeNotifier with ChangeNotifier {
   EtDatetime _selected = EtDatetime.now();
   EtDatetime _changeDate = EtDatetime.now();
@@ -72,8 +74,6 @@ class CalEventProvider with ChangeNotifier {
   }
 }
 
-enum AppThemeMode { system, light, dark }
-
 class ThemeProvider with ChangeNotifier {
   static const _themeKey = 'thememode';
 
@@ -120,5 +120,83 @@ class ThemeProvider with ChangeNotifier {
   Future<void> _saveTheme(AppThemeMode mode) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_themeKey, mode.toString());
+  }
+}
+
+class LanguageProvider with ChangeNotifier {
+  Locale _locale = const Locale("en");
+  bool _isLoading = true;
+
+  Locale get locale => _locale;
+  bool get isLoading => _isLoading;
+
+  static const Map<String, String> supportedLanguages = {
+    'en': 'English',
+    'am': 'አማርኛ',
+    // 'om': 'Oromiffa',
+  };
+
+  LanguageProvider() {
+    _loadSavedLanguages();
+  }
+
+  // PRIVATE METHOD - Load saved language from SharedPreferences
+  Future<void> _loadSavedLanguages() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final languageCode = prefs.getString('language_code');
+
+      if (languageCode != null &&
+          supportedLanguages.containsKey(languageCode)) {
+        _locale = Locale(languageCode);
+      } else {
+        // If no saved language or invalid language, keep default
+        _locale = const Locale('en');
+      }
+    } catch (e) {
+      // If error loading, use default
+      _locale = const Locale('en');
+      debugPrint('Error loading saved language: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Tell all widgets listening to this provider to rebuild
+    }
+  }
+
+  // PUBLIC METHOD - Change language and save to SharedPreferences
+  Future<void> setLocale(Locale locale) async {
+    if (_locale == locale) return; // Don't do anything if same language
+
+    try {
+      // Save to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('language_code', locale.languageCode);
+
+      // Update the current locale
+      _locale = locale;
+
+      // Notify all listening widgets to rebuild
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error saving language: $e');
+      // You might want to show a snackbar or error message here
+    }
+  }
+
+  // HELPER METHOD - Change language by language code string
+  Future<void> setLanguage(String languageCode) async {
+    if (supportedLanguages.containsKey(languageCode)) {
+      await setLocale(Locale(languageCode));
+    }
+  }
+
+  // HELPER METHOD - Get display name for current language
+  String get currentLanguageName {
+    return supportedLanguages[_locale.languageCode] ?? 'English';
+  }
+
+  // HELPER METHOD - Check if a language is currently selected
+  bool isLanguageSelected(String languageCode) {
+    return _locale.languageCode == languageCode;
   }
 }

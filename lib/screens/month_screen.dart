@@ -81,22 +81,11 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
   }
 
   Widget _buildWeekdayHeaders(int startOfWeek) {
-    // Generate weekday names starting from custom start day
-    // final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    // final weekdays = List.generate(7, (index) {
-    //   final weekday =
-    //       (startOfWeek - 1 + index) % 7 + 1; // Calculate weekday number
-    //   return DateFormat(
-    //     'E',
-    //   ).format(DateTime(2023, 1, weekday)); // Any date with known weekday
-    // });
-
     return Table(
       children: [
         TableRow(
           children:
-              weekdays
+              getLocalizedEthiopianWeekDays(context)
                   .map(
                     (day) => Container(
                       alignment: Alignment.center,
@@ -107,7 +96,7 @@ class _MonthlyScreenState extends State<MonthlyScreen> {
                           fontSize: 16,
                         ),
                         overflow: TextOverflow.clip,
-                        day.toString(),
+                        day,
                       ),
                     ),
                   )

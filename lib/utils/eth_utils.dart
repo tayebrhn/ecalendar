@@ -1,50 +1,68 @@
 import 'package:abushakir/abushakir.dart';
+import 'package:ecalendar/l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 const initialPage = 10000;
-const int dayGrid = 42;
-final weekdays = ['ሰኞ', 'ማክሰኞ', 'ረቡዕ', 'ሐሙስ', 'አርብ', 'ቅዳሜ', 'እሑድ'];
-final months = [
-  'መስከረም',
-  'ጥቅምት',
-  'ኅዳር',
-  'ታኅሣሥ',
-  'ጥር',
-  'የካቲት',
-  'መጋቢት',
-  'ሚያዝያ',
-  'ግንቦት',
-  'ሰኔ',
-  'ሐምሌ',
-  'ነሐሴ',
-  'ጳጉሜ',
-];
+// const int dayGrid = 42;
+// final weekdays = ['ሰኞ', 'ማክሰኞ', 'ረቡዕ', 'ሐሙስ', 'አርብ', 'ቅዳሜ', 'እሑድ'];
+// final months = [
+//   'መስከረም',
+//   'ጥቅምት',
+//   'ኅዳር',
+//   'ታኅሣሥ',
+//   'ጥር',
+//   'የካቲት',
+//   'መጋቢት',
+//   'ሚያዝያ',
+//   'ግንቦት',
+//   'ሰኔ',
+//   'ሐምሌ',
+//   'ነሐሴ',
+//   'ጳጉሜ',
+// ];
 
-final englishMonthNames = [
-  'Meskerem',
-  'Tikimit',
-  'Hidar',
-  'Tahsas',
-  'Tir',
-  'Yekatit',
-  'Megabit',
-  'Miyazya',
-  'Ginbot',
-  'Sene',
-  'Hamle',
-  'Nehase',
-  'Pagume',
-];
-
-String mYYYY(EtDatetime date) {
-  String monthName = englishMonthNames[date.month - 1];
-  String year = date.year.toString();
-
-  return "$monthName $year";
+List<String> getLocalizedEthiopianWeekDays(BuildContext context) {
+  return List.generate(7, (i) => localizedWeekdayName(context, i + 1));
 }
 
-String yYYYMD(EtDatetime date) {
-  String monthName = englishMonthNames[date.month - 1];
+List<String> getLocalizedEthiopianMonths(BuildContext context) {
+  return List.generate(13, (i) => localizedEthiopianMonthName(context, i + 1));
+}
+
+// final englishMonthNames = [
+//   'Meskerem',
+//   'Tikimit',
+//   'Hidar',
+//   'Tahsas',
+//   'Tir',
+//   'Yekatit',
+//   'Megabit',
+//   'Miyazya',
+//   'Ginbot',
+//   'Sene',
+//   'Hamle',
+//   'Nehase',
+//   'Pagume',
+// ];
+
+String localizedEthiopianMonthName(BuildContext context, int monthIndex) {
+  return AppLocalizations.of(context)!.ethiopianMonth(monthIndex.toString());
+}
+
+String localizedWeekdayName(BuildContext context, int weekdayIndex) {
+  return AppLocalizations.of(
+    context,
+  )!.ethiopianWeekday(weekdayIndex.toString());
+}
+
+String mYYYY(BuildContext context, EtDatetime date) {
+  final monthName = localizedEthiopianMonthName(context, date.month);
+  return "$monthName ${date.year}";
+}
+
+String yYYYMD(BuildContext context, EtDatetime date) {
+  final monthName = localizedEthiopianMonthName(context, date.month);
   String year = date.year.toString();
   String day = date.day.toString();
 
@@ -57,11 +75,13 @@ String toGreg(EtDatetime date) {
   ).format(DateTime.fromMillisecondsSinceEpoch(date.moment));
 }
 
-String getDayName(EtDatetime index) {
+String getDayName(BuildContext context, EtDatetime index) {
   if (index.day == index.weekday) {
-    return weekdays[index.weekday];
+    return getLocalizedEthiopianWeekDays(context)[index.weekday];
   }
-  return weekdays[((index.day - 1) + index.weekday) % 7];
+  return getLocalizedEthiopianWeekDays(
+    context,
+  )[((index.day - 1) + index.weekday) % 7];
 }
 
 EtDatetime getfirstDayOfWeek(EtDatetime date) {

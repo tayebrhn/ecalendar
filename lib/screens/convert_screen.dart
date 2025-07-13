@@ -1,4 +1,5 @@
 import 'package:abushakir/abushakir.dart';
+import 'package:ecalendar/l10n/app_localizations.dart';
 import '../widgets/vertical_date_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -31,7 +32,7 @@ class _ConvertScreenState extends State<ConvertScreen> {
             child: Column(
               children: [
                 Text(
-                  'To Gregorian Calendar:',
+                  AppLocalizations.of(context)!.toGregorian,
                   style: TextStyle(color: Colors.grey[500], fontSize: 12),
                 ),
                 SizedBox(height: 20),

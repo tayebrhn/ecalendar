@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '/screens/about_screen.dart';
 import '/screens/convert_screen.dart';
 import '/screens/month_screen.dart';
@@ -7,6 +9,8 @@ import '/utils/eth_utils.dart';
 import '/utils/themedata_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 
 void main() {
   runApp(
@@ -21,6 +25,9 @@ void main() {
         ChangeNotifierProvider<ThemeProvider>(
           create: (context) => ThemeProvider(),
         ),
+        ChangeNotifierProvider<LanguageProvider>(
+          create: (context) => LanguageProvider(),
+        ),
       ],
       child: MyApp(),
     ),
@@ -32,22 +39,41 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        colorScheme: CalendarColorScheme.lightColorScheme,
-        useMaterial3: true,
-        extensions: const <ThemeExtension<dynamic>>[CalendarThemeData.light],
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: CalendarColorScheme.darkColorScheme,
-        useMaterial3: true,
-        extensions: const <ThemeExtension<dynamic>>[CalendarThemeData.dark],
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+    return Consumer<LanguageProvider>(
+      builder: (context, langProvider, child) {
+        if (langProvider.isLoading) {
+          return MaterialApp(
+            home: Scaffold(body: Center(child: CircularProgressIndicator())),
+          );
+        }
 
-      themeMode: Provider.of<ThemeProvider>(context, listen: true).currentTheme,
-      home: MainScreen(),
+        return MaterialApp(
+          theme: ThemeData(
+            colorScheme: CalendarColorScheme.lightColorScheme,
+            useMaterial3: true,
+            extensions: const <ThemeExtension<dynamic>>[
+              CalendarThemeData.light,
+            ],
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: CalendarColorScheme.darkColorScheme,
+            useMaterial3: true,
+            extensions: const <ThemeExtension<dynamic>>[CalendarThemeData.dark],
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          locale: langProvider.locale,
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          themeMode:
+              Provider.of<ThemeProvider>(context, listen: true).currentTheme,
+          supportedLocales: [Locale("en"), Locale("am")],
+          home: MainScreen(),
+        );
+      },
     );
   }
 }
@@ -61,6 +87,11 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   final List<Widget> _screens = [
     MonthlyScreen(),
@@ -89,7 +120,7 @@ class _MainScreenState extends State<MainScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              mYYYY(dateChange),
+              mYYYY(context, dateChange),
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             Text(toGreg(dateChange), style: TextStyle(fontSize: 14)),
@@ -158,7 +189,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    getDayName(date),
+                    getDayName(context, date),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -166,7 +197,7 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   ),
                   Text(
-                    yYYYMD(date),
+                    yYYYMD(context, date),
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
@@ -179,17 +210,25 @@ class _MainScreenState extends State<MainScreen> {
 
             _buildDrawerItem(
               icon: Icons.calendar_view_month,
-              title: 'Month',
+              title: AppLocalizations.of(context)!.month,
               index: 0,
             ),
             _buildDrawerItem(
               icon: Icons.compare_arrows_sharp,
-              title: 'Date convert',
+              title: AppLocalizations.of(context)!.dateConvert,
               index: 1,
             ),
-            _buildDrawerItem(icon: Icons.settings, title: 'Settings', index: 2),
+            _buildDrawerItem(
+              icon: Icons.settings,
+              title: AppLocalizations.of(context)!.settings,
+              index: 2,
+            ),
             Divider(),
-            _buildDrawerItem(icon: Icons.info, title: 'About', index: 3),
+            _buildDrawerItem(
+              icon: Icons.info,
+              title: AppLocalizations.of(context)!.about,
+              index: 3,
+            ),
             Divider(),
           ],
         ),
